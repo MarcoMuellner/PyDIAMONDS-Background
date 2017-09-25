@@ -1,54 +1,99 @@
 import numpy as np
 import pyDiamonds as diamonds
+import os
+from models.NoiseBackgroundModel import NoiseBackgroundModel
 
-class Background:
-    def __init__(self,kicID,model,data,resultsPath,backgroundHyperParameters,nyquistFrequency,
-                 xMeansConfiguratingParameters = None,nsmConfiguringParameters = None):
-        self.backgroundModel = model
-        self.data = data
-        self._resultsPath = resultsPath
-        self.backgroundHyperParameters = backgroundHyperParameters
-        self._nyquistFrequency = nyquistFrequency
+kicID = "002436458"
+runID = "fullBackground"
 
-        if xMeansConfiguratingParameters is not None:
-            self._xMeansConfigurating =xMeansConfiguratingParameters
-        else:
-            self._xMeansConfigurating = self.xMeansDefault()
+#some paths
+inputDir = os.path.abspath("data/")
+inputFileName = os.path.abspath("data/KIC"+kicID+".txt")
+outputDir = os.path.abspath("results/KIC"+kicID+"/")
+outputPathPrefix = outputDir + "/" + runID + "/background_"
+
+#Read the input dataset
+data = np.loadtxt(inputFileName).T
+if(len(data) != 2):
+    raise ValueError("Input dataset for KIC"+kicID+".txt hast "+str(len(data))+" columns. 2 are needed")
+
+covariates = data[0].astype(float)
+observations = data[1].astype(float)
+
+#1. setup priors
+priorFileName = outputDir + "/background_hyperParameters.txt"
+priors = np.loadtxt(priorFileName).T
+
+if len(priors) != 2:
+    raise ValueError("Wrong number of input prior boundaries. "+str(len(priors))+" are provided, 2 are needed")
+
+if len(priors[0]) not in [12,10,7]:
+    raise ValueError("Wrong number of dimensions for hyper-parameters for background model. The dimension of the "
+                     "parameter are "+str(len(priors))+", 12,10 or 7 are needed")
+
+hyperParametersMinima = priors[0].astype(float)
+hyperParametersMaxima = priors[1].astype(float)
+
+uniformPriors = diamonds.UniformPrior(hyperParametersMinima,hyperParametersMaxima)
+
+fullPathHyperParameters = outputPathPrefix + "hyperParametersUniform.txt"
+
+uniformPriors.writeHyperParametersToFile(fullPathHyperParameters)
+
+#2. setup models for the inference problem
+nyqFreqFile = outputDir+"/NyquistFrequency.txt"
+model = NoiseBackgroundModel(covariates,nyqFreqFile)
+#3 setup likelihood
+
+likelihood = diamonds.ExponentialLikelihood(observations,model)
+
+#4 setup kmeans
+configuringParameters = np.loadtxt(outputDir + "/Xmeans_configuringParameters.txt").T
+
+if len(configuringParameters) != 2:
+    raise ValueError("Wrong number of input parameters for X-means algorithm. Need 2, got " + str(len(configuringParameters)))
+
+minNclusters = configuringParameters[0]
+maxNclusters = configuringParameters[1]
+
+if minNclusters <= 0 or maxNclusters <= 0 or maxNclusters < minNclusters:
+    raise ValueError("Minimum or maximum number of clusters cannot be <=0 and minimum of clusters cannot be larger"
+                     "than maximum number of clusters")
+
+Ntrials = 10
+relTolerance = 0.01
+
+myMetric = diamonds.EuclideanMetric()
+kmeans = diamonds.KmeansClusterer(myMetric,int(minNclusters),int(maxNclusters),Ntrials,int(relTolerance))
+
+#5 setup and run nested sampling
+
+configuringParameters = np.loadtxt(outputDir + "/NSMC_configuringParameters.txt")
+
+if len(configuringParameters) != 8:
+    raise ValueError("Wrong number of input parameters for NSMC algorithm")
+
+printOnScreen = True
+initialNlivePoints = configuringParameters[0]
+minNlivePoints = configuringParameters[1]
+maxNdrawAttempts = configuringParameters[2]
+NinitialIterationsWithoutClustering = configuringParameters[3]
+NiterationsWithSameClustering = configuringParameters[4]
+initialEnlargementFraction = 0.267*(len(priors[0]))**0.643
+shrinkingRate = configuringParameters[6]
+
+if shrinkingRate > 1 or shrinkingRate < 0:
+    raise ValueError("Shrinking Rate for ellipsoids must be in range [0,1]")
+
+terminationFactor = configuringParameters[7]
+
+nestedSampler = diamonds.MultiEllipsoidSampler(printOnScreen,priors,likelihood,myMetric,kmeans,initialNlivePoints,minNlivePoints,
+                                               initialEnlargementFraction,shrinkingRate)
 
 
-        if nsmConfiguringParameters is not None:
-            self._nsmConfiguringParameters = nsmConfiguringParameters
-        else:
-            self._nsmConfiguringParameters = self.nsmcDefault()
-
-        self._uniformPriors = self.uniformPriorsObject(backgroundHyperParameters[0],backgroundHyperParameters[1])
-        self._likelihood = diamonds.ExponentialLikelihood(data[1],model)
-        self._kMeansClusterer = diamonds.KmeansClusterer(diamonds.EuclideanMetric(),xMeansConfiguratingParameters[0],
-                                                         xMeansConfiguratingParameters[1],10,0.01)
-
-    @property
-    def backgroundModel(self):
-        return self._backgroundModel
-
-    @backgroundModel.setter
-    def backgroundModel(self,model):
-        self._backgroundModel = model
-
-    @property
-    def backgroundHyperParameters(self):
-        return self._backgroundHyperParameters
-
-    @backgroundHyperParameters.setter
-    def backgroundHyperParameters(self,parameters):
-        self._backgroundHyperParameters = parameters
-
-    def xMeansDefault(self):
-        pass
-
-    def nsmcDefault(self):
-        return np.array([500,500,50000,1500,50,2.10,0.01,0.001])
 
 
-    def uniformPriorsObject(self,minParameters,maxParameters):
-        return diamonds.UniformPrior(minParameters,maxParameters)
+
+
+
 
