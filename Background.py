@@ -87,7 +87,7 @@ if shrinkingRate > 1 or shrinkingRate < 0:
 
 terminationFactor = configuringParameters[7]
 
-nestedSampler = diamonds.MultiEllipsoidSampler(printOnScreen,priors,likelihood,myMetric,kmeans,initialNlivePoints,minNlivePoints,
+nestedSampler = diamonds.MultiEllipsoidSampler(printOnScreen,[uniformPriors],likelihood,myMetric,kmeans,int(initialNlivePoints),int(minNlivePoints),
                                                initialEnlargementFraction,shrinkingRate)
 
 
