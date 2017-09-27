@@ -6,3 +6,7 @@ pyDiamonds\.so
 models/__pycache__/
 
 results/KIC002436458/fullBackground/
+
+\.cache/v/cache/
+
+tests/\.cache/v/cache/

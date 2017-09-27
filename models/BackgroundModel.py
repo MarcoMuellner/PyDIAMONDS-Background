@@ -5,7 +5,7 @@ class BackgroundModel(Model):
     def __init__(self, covariates, dimension, name):
         covariates = covariates.astype(float)
         Model.__init__(self,covariates)
-        self._dimension = parameterDimensions
+        self._dimension = dimension
         self._name = name
         pass
 

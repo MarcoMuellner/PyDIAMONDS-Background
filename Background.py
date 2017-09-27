@@ -92,11 +92,11 @@ class Background:
             self._dataPath = None
             self._resultsPath = None
 
-        self._data = self._setupData(kicID,data,self._dataPath)
+        self._data = self._setupData(kicID,self._dataPath,data)
         self._model = model
         self._metric = EuclideanMetric()
         self._uniformPrior = self._setupPriors(kicID,self._resultsPath,priors)
-        self._likelihood = ExponentialLikelihood(self._data[0],self._model)
+        self._likelihood = ExponentialLikelihood(self._data[0].astype(float),self._model)
         self._kmeansClusterer = self._setupKmeans(self._resultsPath,xmeansConfiguringParameters)
         self._nestedSampler = self._setupNestedSampling(self._resultsPath,nsmcConfiguringParameters)
         # 2nd parameter -> tolerance, 3rd parameter -> exponent
@@ -120,12 +120,7 @@ class Background:
         :return:Returns the data of the star in form of a 2xn numpy array
         :rtype:ndarray
         """
-        if dataPath is not None:
-            fileName = dataPath + "KIC" + kicID + ".txt"
-        else:
-            fileName = None
-
-        data = self._checkFileExists(data,fileName)
+        data = self._checkFileExists(data,dataPath,"KIC" + kicID + ".txt")
 
         if len(data) != 2:
             raise ValueError("Data needs to have dimensions of 2xn. Actual dimensions are "+str(data.shape))
@@ -147,12 +142,7 @@ class Background:
         :return: The UniformPrior object, which will then be used in the analysis
         :rtype: UniformPrior
         """
-        if dataPath is not None:
-            fileName = dataPath + "background_hyperParameters_" + self._model.name + ".txt"
-        else:
-            fileName = None
-
-        data = self._checkFileExists(data,fileName)
+        data = self._checkFileExists(data,dataPath,"background_hyperParameters_" + self._model.name + ".txt")
 
         if len(data) != 2:
             raise ValueError("Priors need to have a dimension of 2. Actual dimension is "+str(len(data)))
@@ -165,7 +155,7 @@ class Background:
             raise ValueError("Minimum and maxium Priors need to have the same dimensions. Minimum prior as "
                              ""+str(len(data[0]))+" dimensions ,maximum prior has "+str(len(data[1]))+" dimensions.")
 
-        if not all(min<max for (min,max) in zip(data)):
+        if not all(min<max for (min,max) in zip(data[0],data[1])):
             raise ValueError("Minima priors need to be smaller than maximum priors. Minimum priors are "
                              ""+str(data[0])+", maximum priors are "+str(data[1]))
 
@@ -186,18 +176,13 @@ class Background:
         :return: The KmeansClusterer object used for the analysis.
         :rtype: KmeansClusterer
         """
-        if dataPath is not None:
-            fileName = dataPath + "xMeans_configuringParameters.txt"
-        else:
-            fileName = None
-
         try:
-            data = self._checkFileExists(data,fileName)
-        except AttributeError:
+            data = self._checkFileExists(data,dataPath,"Xmeans_configuringParameters.txt")
+        except (IOError, AttributeError) as e:
             data = self._defaultxMeansParameters()
 
-        if len(data) != 2:
-            raise ValueError("Priors need to have a dimension of 2. Actual dimension is "+str(len(data)))
+        if data.size != 2:
+            raise ValueError("Priors need to have a dimension of 2. Actual dimension is "+str(data.size))
 
         if data[0] <= 0 or data[1] <= 0 or data[1] < data[0]:
             raise ValueError("Minimum or maximum number of clusters cannot be <=0 and minimum of clusters cannot be "
@@ -206,7 +191,7 @@ class Background:
         Ntrials = 10
         relTolerance = 0.01
 
-        return KmeansClusterer(self._metric,int(data[0]),int(data[1]),Ntrials,relTolerance)
+        return KmeansClusterer(self._metric,int(data[0]),int(data[1]),Ntrials,float(relTolerance))
 
 
     def _setupNestedSampling(self, dataPath: str = None, data: ndarray = None):
@@ -221,34 +206,29 @@ class Background:
         :return: The MultiEllipsoidSampler used to run DIAMONDS.
         :rtype: MultiEllipsoidSampler
         """
-        if dataPath is not None:
-            fileName = dataPath + "NSMC_configuringParameters.txt"
-        else:
-            fileName = None
-
         try:
-            data = self._checkFileExists(data,fileName)
-        except AttributeError:
-            data = self._defaultxMeansParameters()
+            data = self._checkFileExists(data,dataPath,"NSMC_configuringParameters.txt")
+        except (IOError, AttributeError) as e:
+            data = self._defaultNSMCParameters()
 
-        if len(data) != 8:
-            raise ValueError("NSMC Parameters need to have a dimension of 8. Actual dimension is "+str(len(data)))
+        if data.size != 8:
+            raise ValueError("NSMC Parameters need to have a dimension of 8. Actual dimension is "+str(data.size))
 
         if data[6] > 1 or data[6] < 0:
             raise ValueError("Shrinking Rate for ellipsoids must be 0<x<1. Value is "+str(data[6]))
 
         printOnScreen = True
-        self._initialNlivePoints = data[0]
+        initialNlivePoints = int(data[0])
         minNlivePoints = int(data[1])
         self._maxNdrawAttempts = data[2]
         self._nInitialIterationsWithoutClustering = data[3]
         self._nIterationsWithSameClustering = data[4]
-        initialEnlargementFraction = 0.267*(len(self._model.dimension))**0.643
+        initialEnlargementFraction = 0.267*(self._model.dimension)**0.643
         shrinkingRate = data[6]
         self._terminationFactor = data[7]
 
         return MultiEllipsoidSampler(printOnScreen,[self._uniformPrior],self._likelihood,self._metric,self._kmeansClusterer
-                                     ,minNlivePoints,initialEnlargementFraction,shrinkingRate)
+                                     ,initialNlivePoints,minNlivePoints,initialEnlargementFraction,shrinkingRate)
 
 
     def run(self):
@@ -273,18 +253,26 @@ class Background:
         """
         pass
 
-    def _checkFileExists(self,data,fileName):
+    def _checkFileExists(self,data,dataPath, fileName):
+        if dataPath is not None:
+            try:
+                fileName = dataPath + fileName
+            except:
+                raise TypeError("Cannot connotate type "+str(type(dataPath))+" with str!")
+        else:
+            fileName = None
+
         if data is None and fileName is not None:
             if os.path.exists(fileName):
                 data = np.loadtxt(fileName).T
             else:
                 raise IOError(fileName + " does not exist!")
         elif data is None and fileName is None:
-            raise AttributeError("You e")
+            raise AttributeError("You need to set either data or fileName")
         return data
 
     def _defaultxMeansParameters(self):
-        return np.array([1,10])
+        return np.array([1.0,10.0])
 
     def _defaultNSMCParameters(self):
         return np.array([500,500,50000,1500,50,2.1,0.01,0.1])

@@ -3,38 +3,46 @@ from Background import Background
 import numpy as np
 from models.StandardModels import NoiseBackgroundModel
 from pyDiamonds import UniformPrior,KmeansClusterer,MultiEllipsoidSampler
+import os
+from shutil import copyfile,rmtree
 
 kicID = "123456789"
 testFilePath = "tests/testFiles/"
 testPath = "tests/playground/"
 
-def createFolders(tmpdir_factory):
-    root = tmpdir_factory.mkdir(testPath)
-    tmpdir_factory.mkdir(testPath +"data")
-    tmpdir_factory.mkdir(testPath + "results/KIC" + kicID)
-    tmpdir_factory.mkdir(testPath + "empty")
-    return root
+def createFolders():
+    os.mkdir(testPath)
+    os.mkdir(testPath + "data")
+    os.mkdir(testPath + "results")
+    os.mkdir(testPath + "results/KIC" + kicID)
+    os.mkdir(testPath + "empty")
+    return os.path.abspath(testPath)+"/"
+
+def deleteFolders():
+    rmtree(testPath)
 
 def NoiseModel():
-    data = np.loadtxt(testPath + "KICTestFile.txt").T
+    data = np.loadtxt(testFilePath + "KICTestFile.txt").T
     return NoiseBackgroundModel(data[0],testFilePath+"NyquistFrequency.txt")
 
 modelsList = [NoiseModel()]
 
 @pytest.fixture(scope='function',params=modelsList)
-def fileObject(tmpdir_factory,request):
-    root = createFolders(tmpdir_factory)
+def fileObject(request):
+    root = createFolders()
+    request.addfinalizer(deleteFolders)
     return Background(kicID,model = request.param, rootPath=str(root))
 
 @pytest.fixture(scope='function',params=modelsList)
-def valueObject(tmpdir_factory,request):
-    createFolders(tmpdir_factory)
+def valueObject(request):
+    createFolders()
     modelName = "_" + request.param.name if request.param.name != "" else ""
-    data = np.loadtxt(testPath + "KICTestFile.txt").T
-    priors = np.loadtxt(testFilePath+"background_hyperParameters"+modelName+".txt")
+    data = np.loadtxt(testFilePath + "KICTestFile.txt").T
+    priors = np.loadtxt(testFilePath+"background_hyperParameters"+modelName+".txt").T
     nsmc = np.loadtxt(testFilePath+"NSMC_configuringParameters.txt")
     xmeans = np.loadtxt(testFilePath+"Xmeans_configuringParameters.txt")
-    nyquist = np.loadtxt(testFilePath+"NyquistFrequency.txt")[0]
+    nyquist = float(np.loadtxt(testFilePath+"NyquistFrequency.txt"))
+    request.addfinalizer(deleteFolders)
     return Background(kicID,data = data,model=request.param,priors = priors,nsmcConfiguringParameters=nsmc
                       ,nyquistFrequency=nyquist,xmeansConfiguringParameters=xmeans)
 
@@ -70,9 +78,9 @@ def testBackground_ExceptionConditions(valueObject: Background):
 def testSetupData_CorrectData(valueObject: Background):
     fileName = testFilePath+"KICTestFile.txt"
     def testSetupData_File():
-        return valueObject._setupData(kicID,dataPath=testFilePath)
+        return valueObject._setupData("TestFile",dataPath=testFilePath)
     def testSetupData_Data():
-        data = np.loadtxt(fileName)
+        data = np.loadtxt(fileName).T
         return valueObject._setupData(kicID,data=data)
     results = [testSetupData_File(),testSetupData_Data()]
     for result in results:
@@ -97,26 +105,26 @@ def testSetupData_deprecated(valueObject: Background):
 #TestSetup_Prior
 ##Correct Data
 @pytest.mark.parametrize("model",modelsList)
-def testSetupPriors_CorrectData(emptyObject:Background,model):
+def testSetupPriors_CorrectData(valueObject:Background,model):
     modelName = "_" + model.name if model.name != "" else ""
     fileName = testFilePath+"background_hyperParameters"+modelName+".txt"
     def testSetupPriors_File():
         return valueObject._setupPriors(kicID,dataPath=testFilePath)
     def testSetupPriors_Data():
-        data = np.loadtxt(fileName)
+        data = np.loadtxt(fileName).T
         return valueObject._setupPriors(kicID,data=data)
     results = [testSetupPriors_File(),testSetupPriors_Data()]
     for result in results:
         assert isinstance(result, UniformPrior)
-        assert len(result.getMinima()) == modelName.dimension
-        assert len(result.getMaxima()) == modelName.dimension
+        assert len(result.getMinima()) == model.dimension
+        assert len(result.getMaxima()) == model.dimension
 
 ##Deprecated Data
 @pytest.mark.parametrize("model",modelsList)
 def testSetupData_deprecated(valueObject: Background,model):
     modelName = "_" + model.name if model.name != "" else ""
     fileName = testFilePath + "background_hyperParameters" + modelName + ".txt"
-    loadedData = np.loadtxt(fileName)
+    loadedData = np.loadtxt(fileName).T
     arrayList = [np.array((loadedData[1],loadedData[0]))
                  ,np.array((loadedData[0][:-1],loadedData[1][:-1]))
                  ,np.array((loadedData[0],loadedData[1][-1]))]
@@ -135,18 +143,18 @@ def testSetupData_deprecated(valueObject: Background,model):
 
 #TestSetup_Kmeans&NSMC
 ##Correct Data
-def testSetupKMeansNestedSampling_correctData(emptyObject:Background):
+def testSetupKMeansNestedSampling_correctData(valueObject:Background):
     fileNameXMeans = testFilePath+"Xmeans_configuringParameters.txt"
     fileNameNSMC = testFilePath+"NSMC_configuringParameters.txt"
     def testSetup_File(method):
         return method(dataPath=testFilePath)
     def testSetup_Data(method,fileName):
-        data = np.loadtxt(fileName)
+        data = np.loadtxt(fileName).T
         return method(data=data)
     def testSetup_Empty(method):
         return method()
     def testSetup_NoFile(method):
-        return method(datPath=testPath + "empty")
+        return method(dataPath=testPath + "empty/")
 
 
     testFunctions = {
@@ -159,7 +167,7 @@ def testSetupKMeansNestedSampling_correctData(emptyObject:Background):
         assert isinstance(testSetup_Empty(method), object)
         assert isinstance(testSetup_NoFile(method), object)
 
-def testSetupKMeansNestedSampling_deprecated(emptyObject:Background):
+def testSetupKMeansNestedSampling_deprecated(valueObject:Background):
     arrayList = [np.array([0]),np.array([0,1,2]),np.array(([0,1],[0,1]))]
     def testSetup_File(method,array):
         np.savetxt(testPath+"Xmeans_configuringParameters.txt",array)
