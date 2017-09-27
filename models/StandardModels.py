@@ -4,7 +4,7 @@ import numpy as np
 class NoiseBackgroundModel(BackgroundModel):
     def __init__(self,covariates,nyquistFrequencyFileName):
         self._covariates = covariates
-        BackgroundModel.__init__(self,covariates)
+        BackgroundModel.__init__(self,covariates,7,"noise")
         self.readNyquistFrequencyFromFile(nyquistFrequencyFileName)
         sincFunctionArgument = np.pi*covariates/(2*self._nyquistFrequency)
         self._responseFunction = (np.sin(sincFunctionArgument)/sincFunctionArgument)**2

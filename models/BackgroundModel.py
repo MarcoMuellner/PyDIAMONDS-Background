@@ -2,11 +2,11 @@ from pyDiamonds import Model
 import numpy as np
 
 class BackgroundModel(Model):
-    def __init__(self,covariates,parameterDimensions,modelName):
+    def __init__(self, covariates, dimension, name):
         covariates = covariates.astype(float)
         Model.__init__(self,covariates)
-        self._parameterDimensions = parameterDimensions
-        self._modelName = modelName
+        self._dimension = parameterDimensions
+        self._name = name
         pass
 
     def getResponseFunction(self):
@@ -22,9 +22,9 @@ class BackgroundModel(Model):
         raise NotImplementedError("You need to implement predict if you derive from BackgroundModel")
 
     @property
-    def parameterDimensions(self):
-        return self._parameterDimensions
+    def dimension(self):
+        return self._dimension
 
     @property
-    def modelName(self):
-        return self._modelName
+    def name(self):
+        return self._name

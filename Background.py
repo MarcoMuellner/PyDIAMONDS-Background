@@ -2,7 +2,8 @@ import os
 from models.BackgroundModel import BackgroundModel
 from numpy import ndarray
 import numpy as np
-from pyDiamonds import UniformPrior,KmeansClusterer,MultiEllipsoidSampler
+from pyDiamonds import UniformPrior,KmeansClusterer,MultiEllipsoidSampler,EuclideanMetric\
+    ,ExponentialLikelihood,PowerlawReducer
 
 class Background:
     """
@@ -10,8 +11,9 @@ class Background:
     the data against, it will run a Nested Sampling algorithm provided by the PyDIAMONDS package
     (see https://github.com/muma7490/PyDIAMONDS) of the data.
     """
-    def __init__(self,kicID, model ,data = None, priors = None,nsmcConfiguringParameters = None, nyquistFrequency = None
-                 ,xmeansConfiguringParameters = None,rootPath = None):
+    def __init__(self, kicID: str, model: BackgroundModel, data: ndarray = None, priors: ndarray = None,
+                 nsmcConfiguringParameters: ndarray = None
+                 , nyquistFrequency: float = None, xmeansConfiguringParameters: ndarray = None, rootPath: str = None):
         """
         The constructor of the class sets up the Nested Sampler. For this you need all the parameters of the
         constructor, namely the kicID of the star, the runID on which DIAMONDS should run, the Uniform Priors with
@@ -48,7 +50,7 @@ class Background:
         :param priors: The priors on which DIAMONDS will perform the fitting. In general this is a numpy array with
                         2xn values in it, where n represents the number of priors which depend on the model.
                         Background will check if the dimensions have the correct number of values, in accordance to
-                        the parameterDimensions property of the model.
+                        the dimensions property of the model.
                         The priors are assumed to be uniform. The first column describes the min values of the
                         priors, the second column describes the max values of the priors.
         :type priors:ndarray
@@ -76,9 +78,36 @@ class Background:
                         according to the scheme above.
         :type rootPath:str
         """
+
+        if rootPath is not None and os.path.exists(rootPath):
+            rootPath = os.path.abspath(rootPath)+"/"
+            self._dataPath = rootPath + "data/"
+            self._resultsPath = rootPath + "results/KIC" + kicID + "/"
+            if not os.path.exists(self._dataPath):
+                raise IOError("Data Path "+self._dataPath+" does not exist!")
+
+            if not os.path.exists(self._resultsPath):
+                raise IOError("Results Path "+self._resultsPath+" does not exist!")
+        else:
+            self._dataPath = None
+            self._resultsPath = None
+
+        self._data = self._setupData(kicID,data,self._dataPath)
+        self._model = model
+        self._metric = EuclideanMetric()
+        self._uniformPrior = self._setupPriors(kicID,self._resultsPath,priors)
+        self._likelihood = ExponentialLikelihood(self._data[0],self._model)
+        self._kmeansClusterer = self._setupKmeans(self._resultsPath,xmeansConfiguringParameters)
+        self._nestedSampler = self._setupNestedSampling(self._resultsPath,nsmcConfiguringParameters)
+        # 2nd parameter -> tolerance, 3rd parameter -> exponent
+        self._livePointsReducer = PowerlawReducer(self._nestedSampler, 1.e2, 0.4, self._terminationFactor)
+
+        if priors is None and nyquistFrequency is None and nsmcConfiguringParameters is None and \
+                        xmeansConfiguringParameters is None and rootPath is None:
+            raise ValueError("You need to set either the rootPath or all parameters")
         pass
 
-    def _setupData(self,kicID,dataPath = None,data = None):
+    def _setupData(self, kicID: str, dataPath: str = None, data: ndarray = None):
         """
         This method sets up the data, checks its validity and returns it. Generally only used internally. Either
         dataPath or data have to be set. If both are set, data is used.
@@ -91,62 +120,136 @@ class Background:
         :return:Returns the data of the star in form of a 2xn numpy array
         :rtype:ndarray
         """
-        pass
+        if dataPath is not None:
+            fileName = dataPath + "KIC" + kicID + ".txt"
+        else:
+            fileName = None
 
-    def _setupPriors(self,kicID, resultsPath = None, priors = None):
+        data = self._checkFileExists(data,fileName)
+
+        if len(data) != 2:
+            raise ValueError("Data needs to have dimensions of 2xn. Actual dimensions are "+str(data.shape))
+
+        return data
+
+    def _setupPriors(self, kicID: str, dataPath: str = None, data: ndarray = None):
         """
         This method sets up the priors, checks their validity and returns a UniformPrior object. Generally only
         used internally. Either resultsPath or priors have to be set.
         :param kicID: the kicID of the star.
         :type kicID: str
-        :param resultsPath: the results path of the star where the prior file is found according to the scheme in
+        :param dataPath: the results path of the star where the prior file is found according to the scheme in
                             the constructor.
-        :type resultsPath: str
-        :param priors: The actual priors provided through the constructor. Has to be a 2xn numpy array. Will be checked
+        :type dataPath: str
+        :param data: The actual priors provided through the constructor. Has to be a 2xn numpy array. Will be checked
                         against the dimensions defined in the model.
-        :type priors: ndarray
+        :type data: ndarray
         :return: The UniformPrior object, which will then be used in the analysis
         :rtype: UniformPrior
         """
-        pass
+        if dataPath is not None:
+            fileName = dataPath + "background_hyperParameters_" + self._model.name + ".txt"
+        else:
+            fileName = None
 
-    def _setupModel(self,model):
-        """
-        This method sets up the model. Generally only used internally
-        :param model: The model. Has to be derived from BackgroundModel
-        :type model: BackgroundModel
-        :return: The model
-        :rtype: BackgroundModel
-        """
-        pass
+        data = self._checkFileExists(data,fileName)
 
-    def _setupKmeans(self,resultsPath = None, configuringParameters = None):
+        if len(data) != 2:
+            raise ValueError("Priors need to have a dimension of 2. Actual dimension is "+str(len(data)))
+
+        if data.shape != (2,self._model.dimension):
+            raise ValueError("Priors need to have a shape of "+str((2,self._model.dimension))+", their actual shape "
+                                                                                              "is "+str(data.shape))
+
+        if len(data[0]) != len(data[1]):
+            raise ValueError("Minimum and maxium Priors need to have the same dimensions. Minimum prior as "
+                             ""+str(len(data[0]))+" dimensions ,maximum prior has "+str(len(data[1]))+" dimensions.")
+
+        if not all(min<max for (min,max) in zip(data)):
+            raise ValueError("Minima priors need to be smaller than maximum priors. Minimum priors are "
+                             ""+str(data[0])+", maximum priors are "+str(data[1]))
+
+        return UniformPrior(data[0].astype(float),data[1].astype(float))
+
+
+
+
+    def _setupKmeans(self, dataPath: str = None, data: ndarray = None):
         """
         Sets up the KMeans parameters. Generally only used internally. If configuringParmeters is None and
         there is no Xmeans_configuringParameters.txt file available in resultsPath, default values will be used.
         Returns the KmeansClusterer object used for the analysis.
-        :param resultsPath: The path where Xmeans_configuringParameters.txt should be found.
-        :type resultsPath: str
-        :param configuringParameters: The configuringParameters. See constructor documentation for further information.
-        :type configuringParameters: ndarray
+        :param dataPath: The path where Xmeans_configuringParameters.txt should be found.
+        :type dataPath: str
+        :param data: The configuringParameters. See constructor documentation for further information.
+        :type data: ndarray
         :return: The KmeansClusterer object used for the analysis.
         :rtype: KmeansClusterer
         """
-        pass
+        if dataPath is not None:
+            fileName = dataPath + "xMeans_configuringParameters.txt"
+        else:
+            fileName = None
 
-    def _setupNestedSampling(self,resultsPath = None,configuringParameters = None):
+        try:
+            data = self._checkFileExists(data,fileName)
+        except AttributeError:
+            data = self._defaultxMeansParameters()
+
+        if len(data) != 2:
+            raise ValueError("Priors need to have a dimension of 2. Actual dimension is "+str(len(data)))
+
+        if data[0] <= 0 or data[1] <= 0 or data[1] < data[0]:
+            raise ValueError("Minimum or maximum number of clusters cannot be <=0 and minimum of clusters cannot be "
+                             "larger than maximum number of clusters. Min is "+str(data[0])+", max is "+str(data[1]))
+
+        Ntrials = 10
+        relTolerance = 0.01
+
+        return KmeansClusterer(self._metric,int(data[0]),int(data[1]),Ntrials,relTolerance)
+
+
+    def _setupNestedSampling(self, dataPath: str = None, data: ndarray = None):
         """
         Sets up the Nested sampling parameters. Generally only used internally. If configuringParameters is None and
         there is no NSMC_configuringParameters.txt file available in resultsPath, default values will be used. Returns
         the MultiEllispoidSampler object used for the analysis
-        :param resultsPath: The path where NSMC_configuringParameters.txt should be found
-        :type resultsPath: str
-        :param configuringParameters: The configuringParameters. See constructor documentation for further information.
-        :type configuringParameters: ndarray
+        :param dataPath: The path where NSMC_configuringParameters.txt should be found
+        :type dataPath: str
+        :param data: The configuringParameters. See constructor documentation for further information.
+        :type data: ndarray
         :return: The MultiEllipsoidSampler used to run DIAMONDS.
         :rtype: MultiEllipsoidSampler
         """
-        pass
+        if dataPath is not None:
+            fileName = dataPath + "NSMC_configuringParameters.txt"
+        else:
+            fileName = None
+
+        try:
+            data = self._checkFileExists(data,fileName)
+        except AttributeError:
+            data = self._defaultxMeansParameters()
+
+        if len(data) != 8:
+            raise ValueError("NSMC Parameters need to have a dimension of 8. Actual dimension is "+str(len(data)))
+
+        if data[6] > 1 or data[6] < 0:
+            raise ValueError("Shrinking Rate for ellipsoids must be 0<x<1. Value is "+str(data[6]))
+
+        printOnScreen = True
+        self._initialNlivePoints = data[0]
+        minNlivePoints = int(data[1])
+        self._maxNdrawAttempts = data[2]
+        self._nInitialIterationsWithoutClustering = data[3]
+        self._nIterationsWithSameClustering = data[4]
+        initialEnlargementFraction = 0.267*(len(self._model.dimension))**0.643
+        shrinkingRate = data[6]
+        self._terminationFactor = data[7]
+
+        return MultiEllipsoidSampler(printOnScreen,[self._uniformPrior],self._likelihood,self._metric,self._kmeansClusterer
+                                     ,minNlivePoints,initialEnlargementFraction,shrinkingRate)
+
 
     def run(self):
         """
@@ -160,7 +263,7 @@ class Background:
         """
         pass
 
-    def writeResults(self,path,prefix= None):
+    def writeResults(self, path: str, prefix: str = None):
         """
         Writes the results to path.
         :param path: Path where the data is saved.
@@ -169,3 +272,19 @@ class Background:
         :type prefix: str
         """
         pass
+
+    def _checkFileExists(self,data,fileName):
+        if data is None and fileName is not None:
+            if os.path.exists(fileName):
+                data = np.loadtxt(fileName).T
+            else:
+                raise IOError(fileName + " does not exist!")
+        elif data is None and fileName is None:
+            raise AttributeError("You e")
+        return data
+
+    def _defaultxMeansParameters(self):
+        return np.array([1,10])
+
+    def _defaultNSMCParameters(self):
+        return np.array([500,500,50000,1500,50,2.1,0.01,0.1])
