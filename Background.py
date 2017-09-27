@@ -3,7 +3,7 @@ from models.BackgroundModel import BackgroundModel
 from numpy import ndarray
 import numpy as np
 from pyDiamonds import UniformPrior,KmeansClusterer,MultiEllipsoidSampler,EuclideanMetric\
-    ,ExponentialLikelihood,PowerlawReducer
+    ,ExponentialLikelihood,PowerlawReducer,Results
 
 class Background:
     """
@@ -235,15 +235,17 @@ class Background:
         """
         Starts the process of fitting diamonds.
         """
-        pass
+        self._nestedSampler.run(self._livePointsReducer,int(self._nInitialIterationsWithoutClustering),
+                                int(self._nIterationsWithSameClustering),int(self._maxNdrawAttempts),
+                                float(self._terminationFactor),"")
 
     def getResults(self):
         """
         Returns the results for diamonds. Work in progress.
         """
-        pass
+        raise NotImplementedError("Not yet implemented!")
 
-    def writeResults(self, path: str, prefix: str = None):
+    def writeResults(self, path: str, prefix: str = ""):
         """
         Writes the results to path.
         :param path: Path where the data is saved.
@@ -251,7 +253,14 @@ class Background:
         :param prefix: An optional prefix used for all files.
         :type prefix: str
         """
-        pass
+        self._nestedSampler.setOutputPathPrefix(os.path.abspath(path)+"/"+ prefix)
+        self._results = Results(self._nestedSampler)
+        self._results.writeParametersToFile("parameter","txt")
+        self._results.writeLogLikelihoodToFile("logLikelihood.txt")
+        self._results.writeLogWeightsToFile("logWeights.txt")
+        self._results.writeEvidenceInformationToFile("evidenceInformation.txt")
+        self._results.writePosteriorProbabilityToFile("posteriorDistribution.txt")
+        self._results.writeParametersSummaryToFile("parameterSummary.txt",68.3,True)
 
     def _checkFileExists(self,data,dataPath, fileName):
         if dataPath is not None:

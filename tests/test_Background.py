@@ -184,4 +184,8 @@ def testSetupKMeansNestedSampling_deprecated(valueObject:Background):
                 testSetup_File(method,array)
                 testSetup_Data(method,array)
 
+def testResultsWriteToFile(valueObject:Background):
+    valueObject.run()
+    valueObject.writeResults(testPath+"results/KIC"+kicID+"")
+
 
