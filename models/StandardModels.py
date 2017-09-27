@@ -2,12 +2,9 @@ from models.BackgroundModel import BackgroundModel
 import numpy as np
 
 class NoiseBackgroundModel(BackgroundModel):
-    def __init__(self,covariates,nyquistFrequencyFileName):
+    def __init__(self,covariates):
         self._covariates = covariates
         BackgroundModel.__init__(self,covariates,7,"noise")
-        self.readNyquistFrequencyFromFile(nyquistFrequencyFileName)
-        sincFunctionArgument = np.pi*covariates/(2*self._nyquistFrequency)
-        self._responseFunction = (np.sin(sincFunctionArgument)/sincFunctionArgument)**2
 
     def predict(self,predictions,modelParameters):
         flatNoiseLevel = modelParameters[0]
@@ -28,6 +25,10 @@ class NoiseBackgroundModel(BackgroundModel):
         predictions *=self._responseFunction
         predictions +=flatNoiseLevel
         return predictions
+
+    def _calculateResponseFunction(self):
+        sincFunctionArgument = np.pi * self._covariates / (2 * self._nyquistFrequency)
+        self._responseFunction = (np.sin(sincFunctionArgument) / sincFunctionArgument) ** 2
 
 
     def parameterCount(self):

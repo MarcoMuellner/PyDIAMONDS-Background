@@ -18,6 +18,15 @@ class BackgroundModel(Model):
     def readNyquistFrequencyFromFile(self,fileName):
         self._nyquistFrequency = np.loadtxt(fileName).T
 
+    @property
+    def nyquistFrequency(self):
+        return self._nyquistFrequency
+
+    @nyquistFrequency.setter
+    def nyquistFrequency(self,value):
+        self._nyquistFrequency = value
+        self._calculateResponseFunction()
+
     def predict(self,predictions,modelParameters):
         raise NotImplementedError("You need to implement predict if you derive from BackgroundModel")
 
@@ -28,3 +37,6 @@ class BackgroundModel(Model):
     @property
     def name(self):
         return self._name
+
+    def _calculateResponseFunction(self):
+        raise NotImplementedError("You need to implement the calculate response function!")

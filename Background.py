@@ -1,9 +1,12 @@
 import os
-from models.BackgroundModel import BackgroundModel
-from numpy import ndarray
+from pyDiamonds import UniformPrior, KmeansClusterer, MultiEllipsoidSampler, EuclideanMetric \
+    , ExponentialLikelihood, PowerlawReducer, Results
+
 import numpy as np
-from pyDiamonds import UniformPrior,KmeansClusterer,MultiEllipsoidSampler,EuclideanMetric\
-    ,ExponentialLikelihood,PowerlawReducer,Results
+from numpy import ndarray
+
+from models.BackgroundModel import BackgroundModel
+
 
 class Background:
     """
@@ -11,7 +14,7 @@ class Background:
     the data against, it will run a Nested Sampling algorithm provided by the PyDIAMONDS package
     (see https://github.com/muma7490/PyDIAMONDS) of the data.
     """
-    def __init__(self, kicID: str, model: BackgroundModel, data: ndarray = None, priors: ndarray = None,
+    def __init__(self, kicID: str, modelObject: type(BackgroundModel), data: ndarray = None, priors: ndarray = None,
                  nsmcConfiguringParameters: ndarray = None
                  , nyquistFrequency: float = None, xmeansConfiguringParameters: ndarray = None, rootPath: str = None):
         """
@@ -44,8 +47,9 @@ class Background:
 
         :param kicID: The KicID (name) of the star. This is needed for various files.
         :type kicID:str
-        :param model: The model for which DIAMONDS performs the fitting. This has to be derived from
-                        models.BackgroundModel. See the documentation for BackgroundModel on further information
+        :param model: The model for which DIAMONDS performs the fitting. Pass here the class object, which should be
+                        derived from BackgroundModel. The initialization of the object will be done within the
+                        constructor
         :type model: BackgroundModel
         :param priors: The priors on which DIAMONDS will perform the fitting. In general this is a numpy array with
                         2xn values in it, where n represents the number of priors which depend on the model.
@@ -93,7 +97,9 @@ class Background:
             self._resultsPath = None
 
         self._data = self._setupData(kicID,self._dataPath,data)
-        self._model = model
+        self._nyquistFrequency = self._checkFileExists(nyquistFrequency,self._resultsPath,"NyquistFrequency.txt")
+        self._model = modelObject(self._data[0])
+        self._model.nyquistFrequency = self._nyquistFrequency
         self._metric = EuclideanMetric()
         self._uniformPrior = self._setupPriors(kicID,self._resultsPath,priors)
         self._likelihood = ExponentialLikelihood(self._data[0].astype(float),self._model)
@@ -285,3 +291,7 @@ class Background:
 
     def _defaultNSMCParameters(self):
         return np.array([500,500,50000,1500,50,2.1,0.01,0.1])
+
+    @property
+    def model(self):
+        return self._model
