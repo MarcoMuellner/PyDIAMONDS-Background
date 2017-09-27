@@ -1,5 +1,7 @@
-from models.BackgroundModel import BackgroundModel
 import numpy as np
+
+from background.models import BackgroundModel
+
 
 class NoiseBackgroundModel(BackgroundModel):
     def __init__(self,covariates):

@@ -1,6 +1,5 @@
-from Background import Background
-from models.StandardModels import NoiseBackgroundModel
-import numpy as np
+from background.Background import Background
+from background.models.StandardModels import NoiseBackgroundModel
 
 kicID = "123456789"
 nestedSampler = Background(kicID,NoiseBackgroundModel,rootPath="exampleFileStructure")

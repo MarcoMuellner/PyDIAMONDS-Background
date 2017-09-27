@@ -1,10 +1,12 @@
-import pytest
-from Background import Background
-import numpy as np
-from models.StandardModels import NoiseBackgroundModel
-from pyDiamonds import UniformPrior,KmeansClusterer,MultiEllipsoidSampler
 import os
-from shutil import copyfile,rmtree
+from pyDiamonds import UniformPrior, KmeansClusterer, MultiEllipsoidSampler
+from shutil import rmtree
+
+import numpy as np
+import pytest
+
+from background.Background import Background
+from background.models.StandardModels import NoiseBackgroundModel
 
 kicID = "123456789"
 testFilePath = "tests/testFiles/"
