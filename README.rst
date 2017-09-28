@@ -7,6 +7,7 @@ providing a model that describes it. The package depends on ``numpy`` and ``pyDi
 Installation
 ------------
 To install the package call::
+
     pip install pyDiamondsBackground
 
 Documentation
