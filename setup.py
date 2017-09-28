@@ -1,13 +1,12 @@
-from distutils.core import setup
-from setuptools import find_packages
+from setuptools import setup
 
 setup(
     name='pyDiamondsBackground',
-    version='1.0.0',
-    packages=find_packages(),
-    url='https://github.com/muma7490/PyDiamonds-Background',
-    license='MIT',
-    author='Marco Müllner',
+    author='Marco Muellner',
     author_email='muellnermarco@gmail.com',
-    description='An extension to the DIAMONDS code, using the python bindings form pyDiamonds'
+    version='0.1.1dev',
+    packages=['background','background/models'],
+    licencse = 'MIT',
+    long_description=open('README.rst').read(),
+    url='https://github.com/muma7490/PyDIAMONDS-Background'
 )
