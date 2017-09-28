@@ -18,3 +18,5 @@ background/__pycache__/
 dist/
 
 pyDiamondsBackground\.egg-info/
+
+examples/example_RootPath/exampleFiles/results/KIC123456789/run/
