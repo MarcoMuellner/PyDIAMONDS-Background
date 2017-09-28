@@ -1,6 +1,6 @@
 import numpy as np
 
-from background.models import BackgroundModel
+from background.models.BackgroundModel import BackgroundModel
 
 
 class NoiseBackgroundModel(BackgroundModel):

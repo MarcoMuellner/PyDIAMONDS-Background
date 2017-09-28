@@ -10,3 +10,7 @@ results/KIC002436458/fullBackground/
 \.cache/v/cache/
 
 tests/\.cache/v/cache/
+
+background/models/__pycache__/
+
+background/__pycache__/
