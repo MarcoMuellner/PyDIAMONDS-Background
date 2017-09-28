@@ -11,4 +11,4 @@ To install the package call::
 
 Documentation
 -------------
-TBD
+See docs folder

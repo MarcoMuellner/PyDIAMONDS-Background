@@ -18,23 +18,16 @@ A simple example.py of the background extension would look like this::
     bg.writeResults("exampleFiles/results/KIC123456789/run","background_")
 
 This example expects the following file structure::
+
     -rootPath/
         -example.py
-
         -exampleFiles/
-
             -data/
-
                 -KIC123456789.txt
-
             -results/
-
                 -KIC123456789/
-
                     -run/
-
                     -background_hyperParameters_noise.txt
-
                     -NyquistFrequency.txt
 
 Line by line explanation
