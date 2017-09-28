@@ -1,5 +1,5 @@
-from background.Background import Background
-from background.models.StandardModels import NoiseBackgroundModel
+from background import Background
+from background.models import NoiseBackgroundModel
 
 kicID = "123456789"
 nestedSampler = Background(kicID,NoiseBackgroundModel,rootPath="exampleFileStructure")

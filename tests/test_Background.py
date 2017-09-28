@@ -5,8 +5,8 @@ from shutil import rmtree
 import numpy as np
 import pytest
 
-from background.Background import Background
-from background.models.StandardModels import NoiseBackgroundModel
+from background import Background
+from background.models import NoiseBackgroundModel
 
 kicID = "123456789"
 testFilePath = "tests/testFiles/"
@@ -186,7 +186,7 @@ def testSetupKMeansNestedSampling_deprecated(valueObject:Background):
                 testSetup_Data(method,array)
 
 def testResultsWriteToFile(valueObject:Background):
-    #valueObject.run()
+    valueObject.run()
     valueObject.writeResults(testPath+"results/KIC"+kicID+"")
 
 
