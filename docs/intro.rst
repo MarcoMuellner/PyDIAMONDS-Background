@@ -13,7 +13,7 @@ A simple example.py of the background extension would look like this::
     from background import Background
     from background.models import NoiseBackgroundModel
 
-    bg = Background(kicID='123456789',model=NoiseBackgroundModel,rootPath="exampleFiles")
+    bg = Background(kicID='123456789',modelObject=NoiseBackgroundModel,rootPath="exampleFiles")
     bg.run()
     bg.writeResults("exampleFiles/results/KIC123456789/run","background_")
 
