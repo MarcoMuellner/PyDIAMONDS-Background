@@ -1,2 +1,5 @@
 numpy==1.12.1
 pyDiamonds
+sphinx
+sphinx_autodoc_annotation
+sphinx_rtd_theme
