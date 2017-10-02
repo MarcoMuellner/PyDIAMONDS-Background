@@ -24,3 +24,7 @@ examples/example_RootPath/exampleFiles/results/KIC123456789/run/
 examples/example_RootPath/configuringParameters\.txt
 
 configuringParameters\.txt
+
+pyDiamondsBackground/__pycache__/
+
+pyDiamondsBackground/models/__pycache__/

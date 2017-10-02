@@ -6,7 +6,7 @@ from pyDiamondsBackground.models.BackgroundModel import BackgroundModel
 class WhiteNoiseOnlyModel(BackgroundModel):
     def __init__(self,covariates):
         self._covariates = covariates
-        BackgroundModel.__init__(self,covariates,7,"noise")
+        BackgroundModel.__init__(self,covariates,7,"White noise only model","_noise")
 
     def predict(self,predictions,modelParameters):
         flatNoiseLevel = modelParameters[0]

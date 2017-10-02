@@ -3,10 +3,12 @@ from pyDiamonds import UniformPrior, KmeansClusterer, MultiEllipsoidSampler
 from shutil import rmtree
 
 import numpy as np
+from numpy import ndarray
 import pytest
 
 from pyDiamondsBackground import Background
-from pyDiamondsBackground.models import WhiteNoiseOnlyModel,WhiteNoiseOscillationModel,FullBackgroundModel
+from pyDiamondsBackground.models import WhiteNoiseOnlyModel,WhiteNoiseOscillationModel
+from pyDiamondsBackground.strings import SkillingsLog, SkillingsInformationGain, SkillingsErrorLog
 
 kicID = "123456789"
 testFilePath = "tests/testFiles/"
@@ -105,8 +107,7 @@ def testSetupData_deprecated(valueObject: Background):
 ##Correct Data
 @pytest.mark.parametrize("model",modelsList)
 def testSetupPriors_CorrectData(valueObject:Background,model):
-    modelName = "_" + valueObject.model.name if valueObject.model.name != "" else ""
-    fileName = testFilePath+"background_hyperParameters"+modelName+".txt"
+    fileName = testFilePath+"background_hyperParameters"+valueObject.model.fileAppendix+".txt"
     def testSetupPriors_File():
         return valueObject._setupPriors(kicID,dataPath=testFilePath)
     def testSetupPriors_Data():
@@ -121,8 +122,7 @@ def testSetupPriors_CorrectData(valueObject:Background,model):
 ##Deprecated Data
 @pytest.mark.parametrize("model",modelsList)
 def testSetupData_deprecated(valueObject: Background,model):
-    modelName = "_" + valueObject.model.name if valueObject.model.name != "" else ""
-    fileName = testFilePath + "background_hyperParameters" + modelName + ".txt"
+    fileName = testFilePath + "background_hyperParameters" + valueObject.model.fileAppendix + ".txt"
     loadedData = np.loadtxt(fileName).T
     arrayList = [np.array((loadedData[1],loadedData[0]))
                  ,np.array((loadedData[0][:-1],loadedData[1][:-1]))
@@ -183,8 +183,81 @@ def testSetupKMeansNestedSampling_deprecated(valueObject:Background):
                 testSetup_File(method,array)
                 testSetup_Data(method,array)
 
-def testResultsWriteToFile(valueObject:Background):
+def testRun(valueObject:Background):
     valueObject.run()
-    valueObject.writeResults(testPath+"results/KIC"+kicID+"")
+    def testWriteResults():
+        valueObject.writeResults(testPath+"results/KIC"+kicID+"")
+        items = os.listdir(testPath+"results/KIC"+kicID+"")
+        assert "background_evidenceInformation.txt" in items
+        assert "background_logLikelihood.txt" in items
+        assert "background_evidenceWeights.txt" in items
+        assert "background_parameterSummary.txt" in items
+        assert "background_posteriorDistribution.txt" in items
+
+        for i in range(0,valueObject.model.dimension-1):
+            assert "background_parameter00"+str(i) in items
+            assert "background_marginalDistribution00"+str(i) in items
+
+
+    def testGetResults():
+
+        def testGetParameters():
+            dim = valueObject.model.dimension
+            assert len(valueObject.parameters) == dim
+            for i in range(0,dim-1):
+                assert isinstance(valueObject.parameters[i],ndarray)
+                assert isinstance(valueObject.parameters[i], ndarray)
+                assert len(valueObject.parameters[i])
+
+        def testGenericProperty(property):
+            assert isinstance(property, ndarray)
+            assert len(property) > 1
+
+        def testGetEvidenceInformation():
+            assert isinstance(valueObject.evidenceInformation,dict)
+            assert valueObject.evidenceInformation[SkillingsLog] != 0
+            assert valueObject.evidenceInformation[SkillingsInformationGain] != 0
+            assert valueObject.evidenceInformation[SkillingsErrorLog] != 0
+
+        def testGetPosteriorProbabilty():
+            """
+            uncomment this when the property is properly available!
+            assert isinstance(valueObject.posteriorProbability,ndarray)
+            assert len(valueObject.posteriorProbability) > 1
+            """
+            with pytest.raises(NotImplementedError):
+                valueObject.posteriorProbability
+
+        def testGetParameterSummary():
+            """
+            assert isinstance(valueObject.parameterSummary,ndarray)
+            assert len(valueObject.parameterSummary) == 7
+            for i in range(0,len(valueObject.parameterSummary)-1):
+                assert len(valueObject.parameterSummary[i]) == valueObject.model.dimension
+            """
+            with pytest.raises(NotImplementedError):
+                valueObject.parameterSummary
+
+        def testGetMarginalDistributions():
+            """
+            assert isinstance(valueObject.marginalDistributions,ndarray)
+            assert len(valueObject.marginalDistributions) == 2
+            """
+            with pytest.raises(NotImplementedError):
+                valueObject.marginalDistributions
+
+        testGetParameters()
+        testGenericProperty(valueObject.logLikelihood)
+        testGenericProperty(valueObject.logWeights)
+        testGetEvidenceInformation()
+        testGetPosteriorProbabilty()
+        testGetParameterSummary()
+        testGetMarginalDistributions()
+
+    testWriteResults()
+    testGetResults()
+
+
+
 
 

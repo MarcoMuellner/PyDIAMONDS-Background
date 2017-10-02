@@ -2,11 +2,12 @@ from pyDiamonds import Model
 import numpy as np
 
 class BackgroundModel(Model):
-    def __init__(self, covariates, dimension, name):
+    def __init__(self, covariates, dimension, name, fileAppendix=""):
         covariates = covariates.astype(float)
         Model.__init__(self,covariates)
         self._dimension = dimension
         self._name = name
+        self._fileAppendix = fileAppendix
         self._nyquistFrequency = None
         pass
 
@@ -40,6 +41,10 @@ class BackgroundModel(Model):
     @property
     def name(self):
         return self._name
+
+    @property
+    def fileAppendix(self):
+        return self._fileAppendix
 
     def _calculateResponseFunction(self):
         try:

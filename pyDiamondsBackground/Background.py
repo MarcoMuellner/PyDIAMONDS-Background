@@ -6,6 +6,7 @@ import numpy as np
 from numpy import ndarray
 
 from pyDiamondsBackground.models import BackgroundModel
+from pyDiamondsBackground.strings import *
 
 
 class Background:
@@ -97,7 +98,7 @@ class Background:
             self._resultsPath = None
 
         self._data = self._setupData(kicID,self._dataPath,data)
-        self._nyquistFrequency = self._checkFileExists(nyquistFrequency,self._resultsPath,"NyquistFrequency.txt")
+        self._nyquistFrequency = self._checkFileExistsAndRead(nyquistFrequency, self._resultsPath, "NyquistFrequency.txt")
         self._model = modelObject(self._data[0])
         self._model.nyquistFrequency = self._nyquistFrequency
         self._metric = EuclideanMetric()
@@ -126,7 +127,7 @@ class Background:
         :return:Returns the data of the star in form of a 2xn numpy array
         :rtype:ndarray
         """
-        data = self._checkFileExists(data,dataPath,"KIC" + kicID + ".txt")
+        data = self._checkFileExistsAndRead(data, dataPath, "KIC" + kicID + ".txt")
 
         if len(data) != 2:
             raise ValueError("Data needs to have dimensions of 2xn. Actual dimensions are "+str(data.shape))
@@ -148,7 +149,9 @@ class Background:
         :return: The UniformPrior object, which will then be used in the analysis
         :rtype: UniformPrior
         """
-        data = self._checkFileExists(data,dataPath,"background_hyperParameters_" + self._model.name + ".txt")
+
+        data = self._checkFileExistsAndRead(data, dataPath, "background_hyperParameters" +
+                                            self._model.fileAppendix + ".txt")
 
         if len(data) != 2:
             raise ValueError("Priors need to have a dimension of 2. Actual dimension is "+str(len(data)))
@@ -183,7 +186,7 @@ class Background:
         :rtype: KmeansClusterer
         """
         try:
-            data = self._checkFileExists(data,dataPath,"Xmeans_configuringParameters.txt")
+            data = self._checkFileExistsAndRead(data, dataPath, "Xmeans_configuringParameters.txt")
         except (IOError, AttributeError) as e:
             data = self._defaultxMeansParameters()
 
@@ -213,7 +216,7 @@ class Background:
         :rtype: MultiEllipsoidSampler
         """
         try:
-            data = self._checkFileExists(data,dataPath,"NSMC_configuringParameters.txt")
+            data = self._checkFileExistsAndRead(data, dataPath, "NSMC_configuringParameters.txt")
         except (IOError, AttributeError) as e:
             data = self._defaultNSMCParameters()
 
@@ -245,6 +248,41 @@ class Background:
                                 int(self._nIterationsWithSameClustering),int(self._maxNdrawAttempts),
                                 float(self._terminationFactor),"")
 
+    @property
+    def parameters(self):
+        """
+        Property for the
+        :return:
+        :rtype:
+        """
+        return self._nestedSampler.getPosteriorSample()
+
+    @property
+    def logLikelihood(self):
+        return self._nestedSampler.getLogLikelihood()
+
+    @property
+    def logWeights(self):
+        return self._nestedSampler.getLogWeightOfPosteriorSample()
+
+    @property
+    def evidenceInformation(self):
+        return {SkillingsLog:self._nestedSampler.getLogEvidence(),
+                    SkillingsErrorLog:self._nestedSampler.getLogEvidenceError(),
+                    SkillingsInformationGain:self._nestedSampler.getInformationGain()}
+
+    @property
+    def posteriorProbability(self):
+        raise NotImplementedError("Not yet implemented!")
+
+    @property
+    def parameterSummary(self):
+        raise NotImplementedError("Not yet implemented")
+
+    @property
+    def marginalDistributions(self):
+        raise NotImplementedError("Not yet implemented")
+
     def getResults(self):
         """
         Returns the results for diamonds. Work in progress.
@@ -268,7 +306,7 @@ class Background:
         self._results.writePosteriorProbabilityToFile("posteriorDistribution.txt")
         self._results.writeParametersSummaryToFile("parameterSummary.txt",68.3,True)
 
-    def _checkFileExists(self,data,dataPath, fileName):
+    def _checkFileExistsAndRead(self, data, dataPath, fileName):
         if dataPath is not None:
             try:
                 fileName = dataPath + fileName
@@ -294,4 +332,8 @@ class Background:
 
     @property
     def model(self):
+        """
+        :return: Property for the model used in the analysis. Must be derived from BackgroundModel
+        :rtype: BackgroundModel
+        """
         return self._model
