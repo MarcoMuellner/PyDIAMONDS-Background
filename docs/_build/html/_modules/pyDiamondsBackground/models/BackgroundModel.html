@@ -1,0 +1,359 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyDiamondsBackground.models.BackgroundModel &mdash; PyDIAMONDS-Background 0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="PyDIAMONDS-Background 0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> PyDIAMONDS-Background
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PyDIAMONDS-Background</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyDiamondsBackground.models.BackgroundModel</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyDiamondsBackground.models.BackgroundModel</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pyDiamonds</span> <span class="k">import</span> <span class="n">Model</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">ndarray</span>
+
+<div class="viewcode-block" id="BackgroundModel"><a class="viewcode-back" href="../../../source/pyDiamondsBackground.models.html#pyDiamondsBackground.models.BackgroundModel.BackgroundModel">[docs]</a><span class="k">class</span> <span class="nc">BackgroundModel</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Background model is an abstract class, that provides the necessary methods to compute a bayesian analysis with</span>
+<span class="sd">    PyDIAMONDS. It inherits multiple methods already from the Model class from PyDIAMONDS, naming the predict method and</span>
+<span class="sd">    it provides said Models class with the covariates, the frequential axis of the data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">covariates</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">dimension</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fileAppendix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The constructor of the class sets up the class. It sets the names, dimensions, as well as the fileAppendix.</span>
+<span class="sd">        The Nyquist frequency must be set at a later point in using the code using the property for the Nyquist</span>
+<span class="sd">        frequency.</span>
+<span class="sd">        :param covariates: The frequential axis of the dataset.</span>
+<span class="sd">        :type covariates: ndarray</span>
+<span class="sd">        :param dimension: The dimension of the priors. Will be used for a check within Background to check the length of</span>
+<span class="sd">                            the priors</span>
+<span class="sd">        :type dimension: int</span>
+<span class="sd">        :param name: The name of the model.</span>
+<span class="sd">        :type name: str</span>
+<span class="sd">        :param fileAppendix: The appendix for the filename, used for the priors (i.e. hyperparameters*fileAppendix*.txt</span>
+<span class="sd">        :type fileAppendix: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">covariates</span> <span class="o">=</span> <span class="n">covariates</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">Model</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">covariates</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dimension</span> <span class="o">=</span> <span class="n">dimension</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fileAppendix</span> <span class="o">=</span> <span class="n">fileAppendix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nyquistFrequency</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_responseFunction</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="BackgroundModel.getResponseFunction"><a class="viewcode-back" href="../../../source/pyDiamondsBackground.models.html#pyDiamondsBackground.models.BackgroundModel.BackgroundModel.getResponseFunction">[docs]</a>    <span class="k">def</span> <span class="nf">getResponseFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: The response function. Multiplied with the prediction to create an initial sampling</span>
+<span class="sd">        :rtype: ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_responseFunction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Nyquist frequency must be set!&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_responseFunction</span></div>
+
+<div class="viewcode-block" id="BackgroundModel.getNyquistFrequency"><a class="viewcode-back" href="../../../source/pyDiamondsBackground.models.html#pyDiamondsBackground.models.BackgroundModel.BackgroundModel.getNyquistFrequency">[docs]</a>    <span class="k">def</span> <span class="nf">getNyquistFrequency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: The Nyquist frequency. Must have been set previously using the setter property.</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nyquistFrequency</span></div>
+
+<div class="viewcode-block" id="BackgroundModel.readNyquistFrequencyFromFile"><a class="viewcode-back" href="../../../source/pyDiamondsBackground.models.html#pyDiamondsBackground.models.BackgroundModel.BackgroundModel.readNyquistFrequencyFromFile">[docs]</a>    <span class="k">def</span> <span class="nf">readNyquistFrequencyFromFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads the Nyquist frequency from a file and sets it as the used Nyquist frequency</span>
+<span class="sd">        :param: fileName: Name of the file containing the nyquist frequency. Must contain only one item!</span>
+<span class="sd">        :type: fileName: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nyquistFrequency</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span><span class="o">.</span><span class="n">T</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nyquistFrequency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Property of the Nyquist frequency. Raises a ValueError if the Nyquist frequency was not set previously.</span>
+<span class="sd">        :return: The Nyquist frequency</span>
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nyquistFrequency</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Nyquist frequency must be set before accessing it!&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nyquistFrequency</span>
+
+    <span class="nd">@nyquistFrequency</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">nyquistFrequency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setter property for the Nyquist frequency. Also triggers the calculation of the response Function</span>
+<span class="sd">        :param: value: Value for the Nyquist frequency.</span>
+<span class="sd">        :type: value: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nyquistFrequency</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calculateResponseFunction</span><span class="p">()</span>
+
+<div class="viewcode-block" id="BackgroundModel.predict"><a class="viewcode-back" href="../../../source/pyDiamondsBackground.models.html#pyDiamondsBackground.models.BackgroundModel.BackgroundModel.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictions</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">modelParameters</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Predict method, called by PyDIAMONDS to sample an initial value set. Must be implemented in the class</span>
+<span class="sd">        derived from this class. Here one can calculate the model using the modelParameters as an input from DIAMONDS.</span>
+<span class="sd">        Must return the predictions after finishing the calculation.</span>
+<span class="sd">        :param predictions: The predictions for the dataset</span>
+<span class="sd">        :type predictions: ndarray</span>
+<span class="sd">        :param modelParameters: The parameters for the model, representing the priors. Determined by PyDIAMONDS</span>
+<span class="sd">        :type modelParameters: ndarray</span>
+<span class="sd">        :return: The predictions for the dataset using the covariates.</span>
+<span class="sd">        :rtype: ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;You need to implement predict if you derive from BackgroundModel&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Property for the dimensions of the priors</span>
+<span class="sd">        :return: Size of Priors</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dimension</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Property for the name of the model</span>
+<span class="sd">        :return: Name of the model</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fileAppendix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Property for the fileAppendix. Used in Background.</span>
+<span class="sd">        :return: Text for the fileAppendix</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fileAppendix</span>
+
+    <span class="k">def</span> <span class="nf">_calculateResponseFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method calculates the response function, used for the first sampling of the dataset. Backgroundmodel</span>
+<span class="sd">        implements a default implementation, but this could be different for different applications.</span>
+<span class="sd">        :return: The response function using the covariates</span>
+<span class="sd">        :rtype: ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sincFunctionArgument</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_covariates</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nyquistFrequency</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_responseFunction</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">sincFunctionArgument</span><span class="p">)</span> <span class="o">/</span> <span class="n">sincFunctionArgument</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Nyquist frequency was not set before calculating response Function. Set the Nyquist &quot;</span>
+                             <span class="s2">&quot;frequency before performing analysis&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Marco Müllner.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,400 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyDiamondsBackground.models package &mdash; PyDIAMONDS-Background 0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="PyDIAMONDS-Background 0 documentation" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> PyDIAMONDS-Background
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PyDIAMONDS-Background</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>pyDiamondsBackground.models package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/pyDiamondsBackground.models.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pydiamondsbackground-models-package">
+<h1>pyDiamondsBackground.models package<a class="headerlink" href="#pydiamondsbackground-models-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-pyDiamondsBackground.models.BackgroundModel">
+<span id="pydiamondsbackground-models-backgroundmodel-module"></span><h2>pyDiamondsBackground.models.BackgroundModel module<a class="headerlink" href="#module-pyDiamondsBackground.models.BackgroundModel" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pyDiamondsBackground.models.BackgroundModel.BackgroundModel">
+<em class="property">class </em><code class="descclassname">pyDiamondsBackground.models.BackgroundModel.</code><code class="descname">BackgroundModel</code><span class="sig-paren">(</span><em>covariates: numpy.ndarray</em>, <em>dimension: int</em>, <em>name: str</em>, <em>fileAppendix: str = ''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyDiamondsBackground/models/BackgroundModel.html#BackgroundModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyDiamondsBackground.models.BackgroundModel.BackgroundModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pyDiamonds.Model</span></code></p>
+<p>The Background model is an abstract class, that provides the necessary methods to compute a bayesian analysis with
+PyDIAMONDS. It inherits multiple methods already from the Model class from PyDIAMONDS, naming the predict method and
+it provides said Models class with the covariates, the frequential axis of the data.</p>
+<dl class="attribute">
+<dt id="pyDiamondsBackground.models.BackgroundModel.BackgroundModel.dimension">
+<code class="descname">dimension</code><a class="headerlink" href="#pyDiamondsBackground.models.BackgroundModel.BackgroundModel.dimension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property for the dimensions of the priors
+:return: Size of Priors
+:rtype: int</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyDiamondsBackground.models.BackgroundModel.BackgroundModel.fileAppendix">
+<code class="descname">fileAppendix</code><a class="headerlink" href="#pyDiamondsBackground.models.BackgroundModel.BackgroundModel.fileAppendix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property for the fileAppendix. Used in Background.
+:return: Text for the fileAppendix
+:rtype: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDiamondsBackground.models.BackgroundModel.BackgroundModel.getNyquistFrequency">
+<code class="descname">getNyquistFrequency</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyDiamondsBackground/models/BackgroundModel.html#BackgroundModel.getNyquistFrequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyDiamondsBackground.models.BackgroundModel.BackgroundModel.getNyquistFrequency" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The Nyquist frequency. Must have been set previously using the setter property.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDiamondsBackground.models.BackgroundModel.BackgroundModel.getResponseFunction">
+<code class="descname">getResponseFunction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyDiamondsBackground/models/BackgroundModel.html#BackgroundModel.getResponseFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyDiamondsBackground.models.BackgroundModel.BackgroundModel.getResponseFunction" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The response function. Multiplied with the prediction to create an initial sampling</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyDiamondsBackground.models.BackgroundModel.BackgroundModel.name">
+<code class="descname">name</code><a class="headerlink" href="#pyDiamondsBackground.models.BackgroundModel.BackgroundModel.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property for the name of the model
+:return: Name of the model
+:rtype: str</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyDiamondsBackground.models.BackgroundModel.BackgroundModel.nyquistFrequency">
+<code class="descname">nyquistFrequency</code><a class="headerlink" href="#pyDiamondsBackground.models.BackgroundModel.BackgroundModel.nyquistFrequency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property of the Nyquist frequency. Raises a ValueError if the Nyquist frequency was not set previously.
+:return: The Nyquist frequency
+:rtype: float</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDiamondsBackground.models.BackgroundModel.BackgroundModel.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>predictions: numpy.ndarray</em>, <em>modelParameters: numpy.ndarray</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyDiamondsBackground/models/BackgroundModel.html#BackgroundModel.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyDiamondsBackground.models.BackgroundModel.BackgroundModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict method, called by PyDIAMONDS to sample an initial value set. Must be implemented in the class
+derived from this class. Here one can calculate the model using the modelParameters as an input from DIAMONDS.
+Must return the predictions after finishing the calculation.
+:param predictions: The predictions for the dataset
+:type predictions: ndarray
+:param modelParameters: The parameters for the model, representing the priors. Determined by PyDIAMONDS
+:type modelParameters: ndarray
+:return: The predictions for the dataset using the covariates.
+:rtype: ndarray</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyDiamondsBackground.models.BackgroundModel.BackgroundModel.readNyquistFrequencyFromFile">
+<code class="descname">readNyquistFrequencyFromFile</code><span class="sig-paren">(</span><em>fileName: str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyDiamondsBackground/models/BackgroundModel.html#BackgroundModel.readNyquistFrequencyFromFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyDiamondsBackground.models.BackgroundModel.BackgroundModel.readNyquistFrequencyFromFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the Nyquist frequency from a file and sets it as the used Nyquist frequency
+:type fileName: <code class="docutils literal"><span class="pre">str</span></code>
+:param: fileName: Name of the file containing the nyquist frequency. Must contain only one item!
+:type: fileName: str</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyDiamondsBackground.models.FullBackgroundModel">
+<span id="pydiamondsbackground-models-fullbackgroundmodel-module"></span><h2>pyDiamondsBackground.models.FullBackgroundModel module<a class="headerlink" href="#module-pyDiamondsBackground.models.FullBackgroundModel" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pyDiamondsBackground.models.FullBackgroundModel.FullBackgroundModel">
+<em class="property">class </em><code class="descclassname">pyDiamondsBackground.models.FullBackgroundModel.</code><code class="descname">FullBackgroundModel</code><span class="sig-paren">(</span><em>covariates: numpy.ndarray</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyDiamondsBackground/models/FullBackgroundModel.html#FullBackgroundModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyDiamondsBackground.models.FullBackgroundModel.FullBackgroundModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyDiamondsBackground.models.BackgroundModel.BackgroundModel" title="pyDiamondsBackground.models.BackgroundModel.BackgroundModel"><code class="xref py py-class docutils literal"><span class="pre">pyDiamondsBackground.models.BackgroundModel.BackgroundModel</span></code></a></p>
+<p>This class implements a full background model, including colored noise components. It therefore needs 12 priors
+to compute them properly. See documentation for BackgroundModel for further documentation.</p>
+<dl class="method">
+<dt id="pyDiamondsBackground.models.FullBackgroundModel.FullBackgroundModel.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>predictions: numpy.ndarray</em>, <em>modelParameters: numpy.ndarray</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyDiamondsBackground/models/FullBackgroundModel.html#FullBackgroundModel.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyDiamondsBackground.models.FullBackgroundModel.FullBackgroundModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>The predict implementation of this model implements the background of a solar like oscillator including the
+colored noise component of the dataset.
+:param predictions: The predictions for the sampling of the initial dataset
+:type predictions: ndarray
+:param modelParameters: The model parameters used to compute the initial sampling of the dataset, basically
+representing the priors.
+:return: The predictions of the dataset
+:type modelParameters: ndarray</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyDiamondsBackground.models.WhiteNoiseOnlyModel">
+<span id="pydiamondsbackground-models-whitenoiseonlymodel-module"></span><h2>pyDiamondsBackground.models.WhiteNoiseOnlyModel module<a class="headerlink" href="#module-pyDiamondsBackground.models.WhiteNoiseOnlyModel" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pyDiamondsBackground.models.WhiteNoiseOnlyModel.WhiteNoiseOnlyModel">
+<em class="property">class </em><code class="descclassname">pyDiamondsBackground.models.WhiteNoiseOnlyModel.</code><code class="descname">WhiteNoiseOnlyModel</code><span class="sig-paren">(</span><em>covariates</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyDiamondsBackground/models/WhiteNoiseOnlyModel.html#WhiteNoiseOnlyModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyDiamondsBackground.models.WhiteNoiseOnlyModel.WhiteNoiseOnlyModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyDiamondsBackground.models.BackgroundModel.BackgroundModel" title="pyDiamondsBackground.models.BackgroundModel.BackgroundModel"><code class="xref py py-class docutils literal"><span class="pre">pyDiamondsBackground.models.BackgroundModel.BackgroundModel</span></code></a></p>
+<p>This implementation of the Backgroundmodel implements a purely white noise only model, containing only the
+granulation components as well as the white noise.</p>
+<dl class="method">
+<dt id="pyDiamondsBackground.models.WhiteNoiseOnlyModel.WhiteNoiseOnlyModel.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>predictions</em>, <em>modelParameters</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyDiamondsBackground/models/WhiteNoiseOnlyModel.html#WhiteNoiseOnlyModel.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyDiamondsBackground.models.WhiteNoiseOnlyModel.WhiteNoiseOnlyModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>The predict method for this implementation computes a white noise only model for the dataset
+:param predictions: The predictions for the sampling of the initial dataset
+:type predictions: ndarray
+:param modelParameters: The model parameters used to compute the initial sampling of the dataset, basically
+representing the priors.
+:return: The predictions of the dataset
+:type modelParameters: ndarray</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyDiamondsBackground.models.WhiteNoiseOscillationModel">
+<span id="pydiamondsbackground-models-whitenoiseoscillationmodel-module"></span><h2>pyDiamondsBackground.models.WhiteNoiseOscillationModel module<a class="headerlink" href="#module-pyDiamondsBackground.models.WhiteNoiseOscillationModel" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pyDiamondsBackground.models.WhiteNoiseOscillationModel.WhiteNoiseOscillationModel">
+<em class="property">class </em><code class="descclassname">pyDiamondsBackground.models.WhiteNoiseOscillationModel.</code><code class="descname">WhiteNoiseOscillationModel</code><span class="sig-paren">(</span><em>covariates</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyDiamondsBackground/models/WhiteNoiseOscillationModel.html#WhiteNoiseOscillationModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyDiamondsBackground.models.WhiteNoiseOscillationModel.WhiteNoiseOscillationModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyDiamondsBackground.models.BackgroundModel.BackgroundModel" title="pyDiamondsBackground.models.BackgroundModel.BackgroundModel"><code class="xref py py-class docutils literal"><span class="pre">pyDiamondsBackground.models.BackgroundModel.BackgroundModel</span></code></a></p>
+<p>This implementation of the Background model implements a solar like oscillator including granular components as
+well as the white noise component.</p>
+<dl class="method">
+<dt id="pyDiamondsBackground.models.WhiteNoiseOscillationModel.WhiteNoiseOscillationModel.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>predictions</em>, <em>modelParameters</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyDiamondsBackground/models/WhiteNoiseOscillationModel.html#WhiteNoiseOscillationModel.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyDiamondsBackground.models.WhiteNoiseOscillationModel.WhiteNoiseOscillationModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>The predict method for this implementation computes a model for a solar like oscillator with white background
+noise.
+:param predictions: The predictions for the sampling of the initial dataset
+:type predictions: ndarray
+:param modelParameters: The model parameters used to compute the initial sampling of the dataset, basically
+representing the priors.
+:return: The predictions of the dataset
+:type modelParameters: ndarray</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyDiamondsBackground.models">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyDiamondsBackground.models" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Marco Müllner.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

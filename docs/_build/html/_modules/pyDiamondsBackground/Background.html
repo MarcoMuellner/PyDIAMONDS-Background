@@ -1,0 +1,564 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyDiamondsBackground.Background &mdash; PyDIAMONDS-Background 0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="PyDIAMONDS-Background 0 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PyDIAMONDS-Background
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PyDIAMONDS-Background</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyDiamondsBackground.Background</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyDiamondsBackground.Background</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pyDiamonds</span> <span class="k">import</span> <span class="n">UniformPrior</span><span class="p">,</span> <span class="n">KmeansClusterer</span><span class="p">,</span> <span class="n">MultiEllipsoidSampler</span><span class="p">,</span> <span class="n">EuclideanMetric</span> \
+    <span class="p">,</span> <span class="n">ExponentialLikelihood</span><span class="p">,</span> <span class="n">PowerlawReducer</span><span class="p">,</span> <span class="n">Results</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">ndarray</span>
+
+<span class="kn">from</span> <span class="nn">pyDiamondsBackground.models</span> <span class="k">import</span> <span class="n">BackgroundModel</span>
+<span class="kn">from</span> <span class="nn">pyDiamondsBackground.strings</span> <span class="k">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="Background"><a class="viewcode-back" href="../../source/pyDiamondsBackground.html#pyDiamondsBackground.Background.Background">[docs]</a><span class="k">class</span> <span class="nc">Background</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows for backgroundfitting of a Powerspectraldensity of a star. Poviding the PSD and a Model to fit</span>
+<span class="sd">    the data against, it will run a Nested Sampling algorithm provided by the PyDIAMONDS package</span>
+<span class="sd">    (see https://github.com/muma7490/PyDIAMONDS) of the data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kicID</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">modelObject</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">BackgroundModel</span><span class="p">),</span> <span class="n">data</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">priors</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">nsmcConfiguringParameters</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span>
+                 <span class="p">,</span> <span class="n">nyquistFrequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">xmeansConfiguringParameters</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rootPath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The constructor of the class sets up the Nested Sampler. For this you need all the parameters of the</span>
+<span class="sd">        constructor, namely the kicID of the star, the runID on which DIAMONDS should run, the Uniform Priors with</span>
+<span class="sd">        which DIAMONDS will try to fit the data, the NSMC configuring parameters, which will setup the nested sampler,</span>
+<span class="sd">        the XMeans configuring parameter which wil setup the Kmeans clusterer. See the documentation of the parameters</span>
+<span class="sd">        for information on how the content has to look like.</span>
+
+<span class="sd">        It is also possible, to read these values from files, which will occur if the rootPath parameter is set and</span>
+<span class="sd">        any of the other parameters are not set. This assumes, that a data/ and results/ path are available at rootPath.</span>
+<span class="sd">        The files are read in this locations:</span>
+
+<span class="sd">        - data: root/data/KIC*KICID*.txt, where *KICID* is the kicID</span>
+
+<span class="sd">        - priors: root/results/KIC*KICID*/background_hyperParameters_*modelName*.txt where *KICID* is the kicID and</span>
+<span class="sd">                    *modelname* represents the Modelname, taken from the Model class</span>
+
+<span class="sd">        - nyquistFrequency: root/results/KIC*KICID*/NyquistFrequency where *KICID* is the kicID. See the documentation</span>
+<span class="sd">                            of the parameter for further information.</span>
+
+<span class="sd">        -nsmcConfiguringParameters: root/results/KIC*KICID*/NSMC_configuringParameters.txt. *KICID* is the kicID.</span>
+<span class="sd">                                    This is optional, a default configuration is provided</span>
+
+<span class="sd">        -xmeansConfiguringParameters: root/results/KIC*KICID*/Xmeans_configuringParameters.txt. *KICID* is the kicID.</span>
+<span class="sd">                                      This is optional, a default configuration is provided.</span>
+
+<span class="sd">        Call the run method to start the analysis. Call getResults for direct results and writeResults to write the</span>
+<span class="sd">        results to the filesystem.</span>
+
+<span class="sd">        :param kicID: The KicID (name) of the star. This is needed for various files.</span>
+<span class="sd">        :type kicID:str</span>
+<span class="sd">        :param model: The model for which DIAMONDS performs the fitting. Pass here the class object, which should be</span>
+<span class="sd">                        derived from BackgroundModel. The initialization of the object will be done within the</span>
+<span class="sd">                        constructor</span>
+<span class="sd">        :type model: BackgroundModel</span>
+<span class="sd">        :param priors: The priors on which DIAMONDS will perform the fitting. In general this is a numpy array with</span>
+<span class="sd">                        2xn values in it, where n represents the number of priors which depend on the model.</span>
+<span class="sd">                        Background will check if the dimensions have the correct number of values, in accordance to</span>
+<span class="sd">                        the dimensions property of the model.</span>
+<span class="sd">                        The priors are assumed to be uniform. The first column describes the min values of the</span>
+<span class="sd">                        priors, the second column describes the max values of the priors.</span>
+<span class="sd">        :type priors:ndarray</span>
+<span class="sd">        :param nyquistFrequency: The nyquist frequency of the dataset. This has to be computed outside of Background.</span>
+<span class="sd">        :type nyquistFrequency: float</span>
+<span class="sd">        :param nsmcConfiguringParameters: The NSMC configuring parameters for the DIAMONDS run. In general this doesn&#39;t</span>
+<span class="sd">                                            need to be set, as default parameters are provided. For completeness here</span>
+<span class="sd">                                            is a list of values which should be available:</span>
+<span class="sd">                                            - Initial N live points</span>
+<span class="sd">                                            - Minimum N live points</span>
+<span class="sd">                                            - Maximum N live points</span>
+<span class="sd">                                            - N inital Iterations without clustering</span>
+<span class="sd">                                            - N iterations with same clustering</span>
+<span class="sd">                                            - Initial enlargement fraction</span>
+<span class="sd">                                            - Shrinking rate</span>
+<span class="sd">                                            - Termination factor</span>
+<span class="sd">        :type nsmcConfiguringParameters: ndarray</span>
+<span class="sd">        :param xmeansConfiguringParameters: The Xmeans configuring parameters for the DIAMONDS run. In general this</span>
+<span class="sd">                                            doesn&#39;t need to be set, as default parameters are provided. For completeness</span>
+<span class="sd">                                            here is a list of values which should be available:</span>
+<span class="sd">                                            - Minimum N clusters</span>
+<span class="sd">                                            - Maximum N clusters</span>
+<span class="sd">        :type xmeansConfiguringParameters: ndarray</span>
+<span class="sd">        :param rootPath: The root path where the files are assumed. If this is set, it will try to find the files</span>
+<span class="sd">                        according to the scheme above.</span>
+<span class="sd">        :type rootPath:str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">rootPath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rootPath</span><span class="p">):</span>
+            <span class="n">rootPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">rootPath</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;/&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dataPath</span> <span class="o">=</span> <span class="n">rootPath</span> <span class="o">+</span> <span class="s2">&quot;data/&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_resultsPath</span> <span class="o">=</span> <span class="n">rootPath</span> <span class="o">+</span> <span class="s2">&quot;results/KIC&quot;</span> <span class="o">+</span> <span class="n">kicID</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataPath</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Data Path &quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataPath</span><span class="o">+</span><span class="s2">&quot; does not exist!&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resultsPath</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Results Path &quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_resultsPath</span><span class="o">+</span><span class="s2">&quot; does not exist!&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dataPath</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_resultsPath</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setupData</span><span class="p">(</span><span class="n">kicID</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataPath</span><span class="p">,</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nyquistFrequency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkFileExistsAndRead</span><span class="p">(</span><span class="n">nyquistFrequency</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resultsPath</span><span class="p">,</span> <span class="s2">&quot;NyquistFrequency.txt&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">modelObject</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">nyquistFrequency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nyquistFrequency</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span> <span class="o">=</span> <span class="n">EuclideanMetric</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_uniformPrior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setupPriors</span><span class="p">(</span><span class="n">kicID</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_resultsPath</span><span class="p">,</span><span class="n">priors</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_likelihood</span> <span class="o">=</span> <span class="n">ExponentialLikelihood</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kmeansClusterer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setupKmeans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resultsPath</span><span class="p">,</span><span class="n">xmeansConfiguringParameters</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nestedSampler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setupNestedSampling</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resultsPath</span><span class="p">,</span><span class="n">nsmcConfiguringParameters</span><span class="p">)</span>
+        <span class="c1"># 2nd parameter -&gt; tolerance, 3rd parameter -&gt; exponent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_livePointsReducer</span> <span class="o">=</span> <span class="n">PowerlawReducer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nestedSampler</span><span class="p">,</span> <span class="mf">1.e2</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_terminationFactor</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">priors</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">nyquistFrequency</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">nsmcConfiguringParameters</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> \
+                        <span class="n">xmeansConfiguringParameters</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rootPath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You need to set either the rootPath or all parameters&quot;</span><span class="p">)</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_setupData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kicID</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dataPath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets up the data, checks its validity and returns it. Generally only used internally. Either</span>
+<span class="sd">        dataPath or data have to be set. If both are set, data is used.</span>
+<span class="sd">        :param kicID: the kicID of the star.</span>
+<span class="sd">        :type kicID: str</span>
+<span class="sd">        :param dataPath: The path where the data is found in the form of KIC*KICID*.txt.</span>
+<span class="sd">        :type dataPath: str</span>
+<span class="sd">        :param data: The data of the star. Has to be a powerspectraldensity with 2xn dimensions.</span>
+<span class="sd">        :type data:ndarray</span>
+<span class="sd">        :return:Returns the data of the star in form of a 2xn numpy array</span>
+<span class="sd">        :rtype:ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkFileExistsAndRead</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dataPath</span><span class="p">,</span> <span class="s2">&quot;KIC&quot;</span> <span class="o">+</span> <span class="n">kicID</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Data needs to have dimensions of 2xn. Actual dimensions are &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="nf">_setupPriors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kicID</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dataPath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method sets up the priors, checks their validity and returns a UniformPrior object. Generally only</span>
+<span class="sd">        used internally. Either resultsPath or priors have to be set.</span>
+<span class="sd">        :param kicID: the kicID of the star.</span>
+<span class="sd">        :type kicID: str</span>
+<span class="sd">        :param dataPath: the results path of the star where the prior file is found according to the scheme in</span>
+<span class="sd">                            the constructor.</span>
+<span class="sd">        :type dataPath: str</span>
+<span class="sd">        :param data: The actual priors provided through the constructor. Has to be a 2xn numpy array. Will be checked</span>
+<span class="sd">                        against the dimensions defined in the model.</span>
+<span class="sd">        :type data: ndarray</span>
+<span class="sd">        :return: The UniformPrior object, which will then be used in the analysis</span>
+<span class="sd">        :rtype: UniformPrior</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkFileExistsAndRead</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dataPath</span><span class="p">,</span> <span class="s2">&quot;background_hyperParameters&quot;</span> <span class="o">+</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">fileAppendix</span> <span class="o">+</span> <span class="s2">&quot;.txt&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Priors need to have a dimension of 2. Actual dimension is &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">dimension</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Priors need to have a shape of &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">dimension</span><span class="p">))</span><span class="o">+</span><span class="s2">&quot;, their actual shape &quot;</span>
+                                                                                              <span class="s2">&quot;is &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Minimum and maxium Priors need to have the same dimensions. Minimum prior as &quot;</span>
+                             <span class="s2">&quot;&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">+</span><span class="s2">&quot; dimensions ,maximum prior has &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span><span class="o">+</span><span class="s2">&quot; dimensions.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">min</span><span class="o">&lt;</span><span class="nb">max</span> <span class="k">for</span> <span class="p">(</span><span class="nb">min</span><span class="p">,</span><span class="nb">max</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">])):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Minima priors need to be smaller than maximum priors. Minimum priors are &quot;</span>
+                             <span class="s2">&quot;&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="s2">&quot;, maximum priors are &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="k">return</span> <span class="n">UniformPrior</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span>
+
+
+
+
+    <span class="k">def</span> <span class="nf">_setupKmeans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataPath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets up the KMeans parameters. Generally only used internally. If configuringParmeters is None and</span>
+<span class="sd">        there is no Xmeans_configuringParameters.txt file available in resultsPath, default values will be used.</span>
+<span class="sd">        Returns the KmeansClusterer object used for the analysis.</span>
+<span class="sd">        :param dataPath: The path where Xmeans_configuringParameters.txt should be found.</span>
+<span class="sd">        :type dataPath: str</span>
+<span class="sd">        :param data: The configuringParameters. See constructor documentation for further information.</span>
+<span class="sd">        :type data: ndarray</span>
+<span class="sd">        :return: The KmeansClusterer object used for the analysis.</span>
+<span class="sd">        :rtype: KmeansClusterer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkFileExistsAndRead</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dataPath</span><span class="p">,</span> <span class="s2">&quot;Xmeans_configuringParameters.txt&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">IOError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaultxMeansParameters</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Priors need to have a dimension of 2. Actual dimension is &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Minimum or maximum number of clusters cannot be &lt;=0 and minimum of clusters cannot be &quot;</span>
+                             <span class="s2">&quot;larger than maximum number of clusters. Min is &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="s2">&quot;, max is &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="n">Ntrials</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">relTolerance</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+        <span class="k">return</span> <span class="n">KmeansClusterer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_metric</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span><span class="n">Ntrials</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="n">relTolerance</span><span class="p">))</span>
+
+
+    <span class="k">def</span> <span class="nf">_setupNestedSampling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataPath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets up the Nested sampling parameters. Generally only used internally. If configuringParameters is None and</span>
+<span class="sd">        there is no NSMC_configuringParameters.txt file available in resultsPath, default values will be used. Returns</span>
+<span class="sd">        the MultiEllispoidSampler object used for the analysis</span>
+<span class="sd">        :param dataPath: The path where NSMC_configuringParameters.txt should be found</span>
+<span class="sd">        :type dataPath: str</span>
+<span class="sd">        :param data: The configuringParameters. See constructor documentation for further information.</span>
+<span class="sd">        :type data: ndarray</span>
+<span class="sd">        :return: The MultiEllipsoidSampler used to run DIAMONDS.</span>
+<span class="sd">        :rtype: MultiEllipsoidSampler</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkFileExistsAndRead</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dataPath</span><span class="p">,</span> <span class="s2">&quot;NSMC_configuringParameters.txt&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">IOError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defaultNSMCParameters</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;NSMC Parameters need to have a dimension of 8. Actual dimension is &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">data</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Shrinking Rate for ellipsoids must be 0&lt;x&lt;1. Value is &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">6</span><span class="p">]))</span>
+
+        <span class="n">printOnScreen</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">initialNlivePoints</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">minNlivePoints</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_maxNdrawAttempts</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nInitialIterationsWithoutClustering</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nIterationsWithSameClustering</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">initialEnlargementFraction</span> <span class="o">=</span> <span class="mf">0.267</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">dimension</span><span class="p">)</span><span class="o">**</span><span class="mf">0.643</span>
+        <span class="n">shrinkingRate</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_terminationFactor</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">MultiEllipsoidSampler</span><span class="p">(</span><span class="n">printOnScreen</span><span class="p">,[</span><span class="bp">self</span><span class="o">.</span><span class="n">_uniformPrior</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">_likelihood</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_metric</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_kmeansClusterer</span>
+                                     <span class="p">,</span><span class="n">initialNlivePoints</span><span class="p">,</span><span class="n">minNlivePoints</span><span class="p">,</span><span class="n">initialEnlargementFraction</span><span class="p">,</span><span class="n">shrinkingRate</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Background.run"><a class="viewcode-back" href="../../source/pyDiamondsBackground.html#pyDiamondsBackground.Background.Background.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Starts the process of fitting diamonds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nestedSampler</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_livePointsReducer</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nInitialIterationsWithoutClustering</span><span class="p">),</span>
+                                <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nIterationsWithSameClustering</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_maxNdrawAttempts</span><span class="p">),</span>
+                                <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_terminationFactor</span><span class="p">),</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Property for the</span>
+<span class="sd">        :return:</span>
+<span class="sd">        :rtype:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nestedSampler</span><span class="o">.</span><span class="n">getPosteriorSample</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">logLikelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nestedSampler</span><span class="o">.</span><span class="n">getLogLikelihood</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">logWeights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nestedSampler</span><span class="o">.</span><span class="n">getLogWeightOfPosteriorSample</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">evidenceInformation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">SkillingsLog</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_nestedSampler</span><span class="o">.</span><span class="n">getLogEvidence</span><span class="p">(),</span>
+                    <span class="n">SkillingsErrorLog</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_nestedSampler</span><span class="o">.</span><span class="n">getLogEvidenceError</span><span class="p">(),</span>
+                    <span class="n">SkillingsInformationGain</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_nestedSampler</span><span class="o">.</span><span class="n">getInformationGain</span><span class="p">()}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">posteriorProbability</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Not yet implemented!&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">parameterSummary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Not yet implemented&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">marginalDistributions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Not yet implemented&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Background.getResults"><a class="viewcode-back" href="../../source/pyDiamondsBackground.html#pyDiamondsBackground.Background.Background.getResults">[docs]</a>    <span class="k">def</span> <span class="nf">getResults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the results for diamonds. Work in progress.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Not yet implemented!&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Background.writeResults"><a class="viewcode-back" href="../../source/pyDiamondsBackground.html#pyDiamondsBackground.Background.Background.writeResults">[docs]</a>    <span class="k">def</span> <span class="nf">writeResults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes the results to path.</span>
+<span class="sd">        :param path: Path where the data is saved.</span>
+<span class="sd">        :type path:str</span>
+<span class="sd">        :param prefix: An optional prefix used for all files.</span>
+<span class="sd">        :type prefix: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nestedSampler</span><span class="o">.</span><span class="n">setOutputPathPrefix</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span> <span class="n">prefix</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">Results</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nestedSampler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">writeParametersToFile</span><span class="p">(</span><span class="s2">&quot;parameter&quot;</span><span class="p">,</span><span class="s2">&quot;txt&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">writeLogLikelihoodToFile</span><span class="p">(</span><span class="s2">&quot;logLikelihood.txt&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">writeLogWeightsToFile</span><span class="p">(</span><span class="s2">&quot;logWeights.txt&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">writeEvidenceInformationToFile</span><span class="p">(</span><span class="s2">&quot;evidenceInformation.txt&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">writePosteriorProbabilityToFile</span><span class="p">(</span><span class="s2">&quot;posteriorDistribution.txt&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">writeParametersSummaryToFile</span><span class="p">(</span><span class="s2">&quot;parameterSummary.txt&quot;</span><span class="p">,</span><span class="mf">68.3</span><span class="p">,</span><span class="kc">True</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_checkFileExistsAndRead</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">dataPath</span><span class="p">,</span> <span class="n">fileName</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dataPath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">fileName</span> <span class="o">=</span> <span class="n">dataPath</span> <span class="o">+</span> <span class="n">fileName</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot connotate type &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dataPath</span><span class="p">))</span><span class="o">+</span><span class="s2">&quot; with str!&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fileName</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">fileName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fileName</span><span class="p">):</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="n">fileName</span> <span class="o">+</span> <span class="s2">&quot; does not exist!&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">fileName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;You need to set either data or fileName&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="nf">_defaultxMeansParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">10.0</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_defaultNSMCParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">500</span><span class="p">,</span><span class="mi">500</span><span class="p">,</span><span class="mi">50000</span><span class="p">,</span><span class="mi">1500</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="mf">2.1</span><span class="p">,</span><span class="mf">0.01</span><span class="p">,</span><span class="mf">0.1</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: Property for the model used in the analysis. Must be derived from BackgroundModel</span>
+<span class="sd">        :rtype: BackgroundModel</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Marco Müllner.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

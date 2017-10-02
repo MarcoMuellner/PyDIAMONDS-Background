@@ -1,0 +1,338 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Introduction &mdash; PyDIAMONDS-Background 0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="PyDIAMONDS-Background 0 documentation" href="index.html"/>
+        <link rel="prev" title="Welcome to PyDIAMONDS-Background’s documentation!" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> PyDIAMONDS-Background
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#first-example">First example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#line-by-line-explanation">Line by line explanation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#file-descriptions">File descriptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#other-parameters">Other parameters</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PyDIAMONDS-Background</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Introduction</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/intro.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>PyDIAMONDS-Background is an extension to the Python bindings of the DIAMONDS code, which is available at
+<a class="reference external" href="https://github.com/muma7490/PyDIAMONDS">https://github.com/muma7490/PyDIAMONDS</a> . It provides a simple interface, with which the user is able to fit signal,
+providing a model that describes it. The package depends on <code class="docutils literal"><span class="pre">numpy</span></code> and <code class="docutils literal"><span class="pre">pyDiamonds</span></code>.</p>
+<p>Be sure to checkout the PyDIAMONDS code, as further documentation is provided there.</p>
+<div class="section" id="first-example">
+<h2>First example<a class="headerlink" href="#first-example" title="Permalink to this headline">¶</a></h2>
+<p>A simple example.py of the background extension would look like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyDiamondsBackground</span> <span class="kn">import</span> <span class="n">Background</span>
+<span class="kn">from</span> <span class="nn">pyDiamondsBackground.models</span> <span class="kn">import</span> <span class="n">WhiteNoiseOnlyModel</span>
+
+<span class="n">bg</span> <span class="o">=</span> <span class="n">Background</span><span class="p">(</span><span class="n">kicID</span><span class="o">=</span><span class="s1">&#39;123456789&#39;</span><span class="p">,</span><span class="n">modelObject</span><span class="o">=</span><span class="n">WhiteNoiseOnlyModel</span><span class="p">,</span><span class="n">rootPath</span><span class="o">=</span><span class="s2">&quot;exampleFiles&quot;</span><span class="p">)</span>
+<span class="n">bg</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="n">bg</span><span class="o">.</span><span class="n">writeResults</span><span class="p">(</span><span class="s2">&quot;exampleFiles/results/KIC123456789/run&quot;</span><span class="p">,</span><span class="s2">&quot;background_&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This example expects the following file structure:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">rootPath</span><span class="o">/</span>
+    <span class="o">-</span><span class="n">example</span><span class="o">.</span><span class="n">py</span>
+    <span class="o">-</span><span class="n">exampleFiles</span><span class="o">/</span>
+        <span class="o">-</span><span class="n">data</span><span class="o">/</span>
+            <span class="o">-</span><span class="n">KIC123456789</span><span class="o">.</span><span class="n">txt</span>
+        <span class="o">-</span><span class="n">results</span><span class="o">/</span>
+            <span class="o">-</span><span class="n">KIC123456789</span><span class="o">/</span>
+                <span class="o">-</span><span class="n">run</span><span class="o">/</span>
+                <span class="o">-</span><span class="n">background_hyperParameters_noise</span><span class="o">.</span><span class="n">txt</span>
+                <span class="o">-</span><span class="n">NyquistFrequency</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="line-by-line-explanation">
+<h2>Line by line explanation<a class="headerlink" href="#line-by-line-explanation" title="Permalink to this headline">¶</a></h2>
+<p>At the start, import necessary packages:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyDiamondsBackground</span> <span class="kn">import</span> <span class="n">Background</span>
+<span class="kn">from</span> <span class="nn">pyDiamondsBackground.models</span> <span class="kn">import</span> <span class="n">WhiteNoiseOnlyModel</span>
+</pre></div>
+</div>
+<p>Next you need to setup the nested sampler:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">bg</span> <span class="o">=</span> <span class="n">Background</span><span class="p">(</span><span class="n">kicID</span><span class="o">=</span><span class="s1">&#39;123456789&#39;</span><span class="p">,</span><span class="n">model</span><span class="o">=</span><span class="n">WhiteNoiseOnlyModel</span><span class="p">,</span><span class="n">rootPath</span><span class="o">=</span><span class="s2">&quot;exampleFiles&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>These three parameters are the simplest way to setup the Background class:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">kicID</span></code>: This parameter defines the name of the object. It will be used to find the dataFile (in this case dataFile KIC*kicID*.txt) as well as the subfolder below results KIC*kicID*.</li>
+<li><code class="docutils literal"><span class="pre">model</span></code>: This parameter defines the model which is used by DIAMONDS. This can be one of the default models provided by the package, or a custom model, which has to be derived from <code class="docutils literal"><span class="pre">models.BackgroundModel</span></code></li>
+<li><dl class="first docutils">
+<dt><code class="docutils literal"><span class="pre">rootPath</span></code>: This is the path where Background will look for the necessary files to create the internal objects.</dt>
+<dd><ul class="first last">
+<li>You don’t necessarily have to set this path, but if you don’t, you need to provide the rest of the optional
+parameters (see section about optional parameters). If you only set the optional parameters partially, you
+need to set this parameter (for which parameters are totally optional, see below). In general, parameters
+that are not set will be read through files, parameters that are set will not be read through files.</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>After the object is created, you can call run:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">bg</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This will start the process of fitting the data. After the data is fitted, you can write the results to file. This is
+only possible, if <code class="docutils literal"><span class="pre">rootPath</span></code> is set:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">bg</span><span class="o">.</span><span class="n">writeResults</span><span class="p">(</span><span class="s2">&quot;exampleFiles/results/KIC123456789/run&quot;</span><span class="p">,</span><span class="s2">&quot;background&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The first parameter of writeResults defines the folder where the data is written, the second parameter defines a prefix
+to the the fileNames.</p>
+<p>This example shows how to work with the Background code provided you want to use files. There is also the possibility of
+directly setting all parameters through the constructor.</p>
+</div>
+<div class="section" id="file-descriptions">
+<h2>File descriptions<a class="headerlink" href="#file-descriptions" title="Permalink to this headline">¶</a></h2>
+<p>The Background code can handle a couple of different files. These have to fulfill the requirements of existing within
+different subfolders, which have to be contained in the <code class="docutils literal"><span class="pre">rootPath</span></code>. In the folder <code class="docutils literal"><span class="pre">rootPath/data/</span></code> you can have the
+following files:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">KIC$kicID$.txt</span></code>: This is the datafile on which the Background code will work. It has to be 2-dimensional, where
+the first column defines the x-Axis, the second defines the y-Axis</li>
+</ul>
+<p>In the folder <code class="docutils literal"><span class="pre">rootPath/results/</span></code> you can have the following files:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">KIC$kicID$/background_hyperParamters_$name$.txt</span></code>: This file defines the uniform priors used for the fitting.
+Their dimension is checked within the code and has to be equal the length set inside the model. The $name$ is also
+defined by the model.</li>
+<li><code class="docutils literal"><span class="pre">KIC$kicID$/NyquistFrequency.txt</span></code>: This file defines the Nyquist frequency for the dataset.</li>
+<li><code class="docutils literal"><span class="pre">KIC$kicID$/NSMC_configuringParameters.txt</span></code>: This file contains the configuring parameters for the Nested sampler
+used within Background. In general, you don’t need to create this file or set the parameters via the constructor,
+default values are provided within Background.</li>
+<li><code class="docutils literal"><span class="pre">KIC$kicID$/Xmeans_configuringParameters.txt</span></code>: This file contains the configuring parameters for the
+KmeansClusterer. In general, you don’t need to create this file or set the parameters via the constructor,
+default values are provided within Background.</li>
+</ul>
+</div>
+<div class="section" id="other-parameters">
+<h2>Other parameters<a class="headerlink" href="#other-parameters" title="Permalink to this headline">¶</a></h2>
+<p>Background provides also the possibility to set other parameters directly through the constructor. These are
+<code class="docutils literal"><span class="pre">data</span></code> (the dataset), <code class="docutils literal"><span class="pre">priors</span></code> (the uniform priors) and <code class="docutils literal"><span class="pre">nyquistFrequency</span></code> (the nyquist frequency). If you set
+these you don’t need to set the root path (see examples folder for an example).</p>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to PyDIAMONDS-Background’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Marco Müllner.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
