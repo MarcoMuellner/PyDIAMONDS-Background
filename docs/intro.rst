@@ -12,8 +12,8 @@ A simple example.py of the background extension would look like this:
 
 .. code-block:: python
 
-    from background import Background
-    from background.models import WhiteNoiseOnlyModel
+    from pyDiamondsBackground import Background
+    from pyDiamondsBackground.models import WhiteNoiseOnlyModel
 
     bg = Background(kicID='123456789',modelObject=WhiteNoiseOnlyModel,rootPath="exampleFiles")
     bg.run()
@@ -38,8 +38,8 @@ At the start, import necessary packages:
 
 .. code-block:: python
 
-    from background import Background
-    from background.models import WhiteNoiseOnlyModel
+    from pyDiamondsBackground import Background
+    from pyDiamondsBackground.models import WhiteNoiseOnlyModel
 
 Next you need to setup the nested sampler:
 

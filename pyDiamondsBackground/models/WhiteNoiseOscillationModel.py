@@ -1,26 +1,24 @@
 import numpy as np
 
-from background.models.BackgroundModel import BackgroundModel
+from pyDiamondsBackground.models.BackgroundModel import BackgroundModel
 
 
-class FullBackgroundModel(BackgroundModel):
+class WhiteNoiseOscillationModel(BackgroundModel):
     def __init__(self, covariates):
         self._covariates = covariates
-        BackgroundModel.__init__(self, covariates, 12, "noise")
+        BackgroundModel.__init__(self, covariates, 10, "noise")
 
     def predict(self, predictions, modelParameters):
         flatNoiseLevel = modelParameters[0]
-        amplitudeNoise = modelParameters[1]
-        frequenceNoise = modelParameters[2]
-        amplitudeHarvey1 = modelParameters[3]
-        frequencyHarvey1 = modelParameters[4]
-        amplitudeHarvey2 = modelParameters[5]
-        frequencyHarvey2 = modelParameters[6]
-        amplitudeHarvey3 = modelParameters[7]
-        frequencyHarvey3 = modelParameters[8]
-        heightOscillation = modelParameters[9]
-        nuMax = modelParameters[10]
-        sigma = modelParameters[11]
+        amplitudeHarvey1 = modelParameters[1]
+        frequencyHarvey1 = modelParameters[2]
+        amplitudeHarvey2 = modelParameters[3]
+        frequencyHarvey2 = modelParameters[4]
+        amplitudeHarvey3 = modelParameters[5]
+        frequencyHarvey3 = modelParameters[6]
+        heightOscillation = modelParameters[7]
+        nuMax = modelParameters[8]
+        sigma = modelParameters[9]
 
         zeta = 2 * np.sqrt(2) / np.pi
         predictions = zeta * amplitudeHarvey1 ** 2 / (
@@ -37,6 +35,5 @@ class FullBackgroundModel(BackgroundModel):
         predictions *= self._responseFunction
 
         predictions += flatNoiseLevel
-        predictions += 2*np.pi*amplitudeNoise**2/(frequenceNoise(1+np.power(self._covariates/frequenceNoise,2)))
 
         return predictions

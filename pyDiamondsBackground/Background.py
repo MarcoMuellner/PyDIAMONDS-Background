@@ -5,7 +5,7 @@ from pyDiamonds import UniformPrior, KmeansClusterer, MultiEllipsoidSampler, Euc
 import numpy as np
 from numpy import ndarray
 
-from background.models import BackgroundModel
+from pyDiamondsBackground.models import BackgroundModel
 
 
 class Background:

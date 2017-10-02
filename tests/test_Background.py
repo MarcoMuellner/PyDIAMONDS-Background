@@ -5,8 +5,8 @@ from shutil import rmtree
 import numpy as np
 import pytest
 
-from background import Background
-from background.models import WhiteNoiseOnlyModel,WhiteNoiseOscillationModel,FullBackgroundModel
+from pyDiamondsBackground import Background
+from pyDiamondsBackground.models import WhiteNoiseOnlyModel,WhiteNoiseOscillationModel,FullBackgroundModel
 
 kicID = "123456789"
 testFilePath = "tests/testFiles/"

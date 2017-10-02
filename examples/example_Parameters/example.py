@@ -1,5 +1,5 @@
-from background import Background
-from background.models import WhiteNoiseOnlyModel,WhiteNoiseOscillationModel
+from pyDiamondsBackground import Background
+from pyDiamondsBackground.models import WhiteNoiseOnlyModel,WhiteNoiseOscillationModel
 import numpy as np
 
 data = np.loadtxt("exampleFiles/KIC123456789.txt").T

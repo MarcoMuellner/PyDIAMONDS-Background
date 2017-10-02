@@ -1,6 +1,6 @@
 import numpy as np
 
-from background.models.BackgroundModel import BackgroundModel
+from pyDiamondsBackground.models.BackgroundModel import BackgroundModel
 
 
 class WhiteNoiseOnlyModel(BackgroundModel):
