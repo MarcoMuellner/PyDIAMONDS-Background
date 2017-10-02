@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 from background import Background
-from background.models import NoiseBackgroundModel
+from background.models import WhiteNoiseOnlyModel,WhiteNoiseOscillationModel,FullBackgroundModel
 
 kicID = "123456789"
 testFilePath = "tests/testFiles/"
@@ -23,10 +23,8 @@ def createFolders():
 def deleteFolders():
     rmtree(testPath)
 
-def NoiseModel():
-    return NoiseBackgroundModel
-
-modelsList = [(NoiseModel(),"_noise")]
+modelsList = [(WhiteNoiseOnlyModel,"_noise"),
+              (WhiteNoiseOscillationModel,"")]
 
 @pytest.fixture(scope='function',params=modelsList)
 def fileObject(request):

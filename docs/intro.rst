@@ -8,8 +8,8 @@ Be sure to checkout the PyDIAMONDS code, as further documentation is provided th
 
 First example
 -------------
-A simple example.py of the background extension would look like this::
-
+A simple example.py of the background extension would look like this:
+.. code-block:: python
     from background import Background
     from background.models import NoiseBackgroundModel
 
@@ -32,13 +32,15 @@ This example expects the following file structure::
 
 Line by line explanation
 ------------------------
-At the start, import necessary packages::
+At the start, import necessary packages:
 
+.. code-block:: python
     from background import Background
     from background.models import NoiseBackgroundModel
 
-Next you need to setup the nested sampler::
+Next you need to setup the nested sampler:
 
+.. code-block:: python
     bg = Background(kicID='123456789',model=NoiseBackgroundModel,rootPath="exampleFiles")
 
 These three parameters are the simplest way to setup the Background class:
@@ -51,13 +53,15 @@ These three parameters are the simplest way to setup the Background class:
             need to set this parameter (for which parameters are totally optional, see below). In general, parameters
             that are not set will be read through files, parameters that are set will not be read through files.
 
-After the object is created, you can call run::
+After the object is created, you can call run:
 
+.. code-block:: python
     bg.run()
 
 This will start the process of fitting the data. After the data is fitted, you can write the results to file. This is
-only possible, if ``rootPath`` is set::
+only possible, if ``rootPath`` is set:
 
+.. code-block:: python
     bg.writeResults("exampleFiles/results/KIC123456789/run","background")
 
 The first parameter of writeResults defines the folder where the data is written, the second parameter defines a prefix

@@ -7,6 +7,7 @@ class BackgroundModel(Model):
         Model.__init__(self,covariates)
         self._dimension = dimension
         self._name = name
+        self._nyquistFrequency = None
         pass
 
     def getResponseFunction(self):
@@ -20,6 +21,8 @@ class BackgroundModel(Model):
 
     @property
     def nyquistFrequency(self):
+        if self._nyquistFrequency is None:
+            raise ValueError("Nyquist frequency must be set before accessing it!")
         return self._nyquistFrequency
 
     @nyquistFrequency.setter
@@ -39,4 +42,9 @@ class BackgroundModel(Model):
         return self._name
 
     def _calculateResponseFunction(self):
-        raise NotImplementedError("You need to implement the calculate response function!")
+        try:
+            sincFunctionArgument = np.pi * self._covariates / (2 * self._nyquistFrequency)
+            self._responseFunction = (np.sin(sincFunctionArgument) / sincFunctionArgument) ** 2
+        except:
+            raise ValueError("Nyquist frequency was not set before calculating response Function. Set the Nyquist "
+                             "frequency before performing analysis")

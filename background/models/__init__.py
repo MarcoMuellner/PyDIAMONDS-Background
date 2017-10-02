@@ -1,2 +1,2 @@
 from background.models.BackgroundModel import BackgroundModel
-from background.models.StandardModels import NoiseBackgroundModel
+from background.models.WhiteNoiseOnlyModel import WhiteNoiseOnlyModel

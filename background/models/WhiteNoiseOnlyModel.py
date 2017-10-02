@@ -3,7 +3,7 @@ import numpy as np
 from background.models.BackgroundModel import BackgroundModel
 
 
-class NoiseBackgroundModel(BackgroundModel):
+class WhiteNoiseOnlyModel(BackgroundModel):
     def __init__(self,covariates):
         self._covariates = covariates
         BackgroundModel.__init__(self,covariates,7,"noise")
@@ -28,10 +28,4 @@ class NoiseBackgroundModel(BackgroundModel):
         predictions +=flatNoiseLevel
         return predictions
 
-    def _calculateResponseFunction(self):
-        sincFunctionArgument = np.pi * self._covariates / (2 * self._nyquistFrequency)
-        self._responseFunction = (np.sin(sincFunctionArgument) / sincFunctionArgument) ** 2
 
-
-    def parameterCount(self):
-        return 7
