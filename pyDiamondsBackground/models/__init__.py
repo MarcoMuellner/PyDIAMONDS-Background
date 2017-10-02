@@ -1,2 +1,2 @@
-from background.models.BackgroundModel import BackgroundModel
-from background.models.WhiteNoiseOnlyModel import WhiteNoiseOnlyModel
+from pyDiamondsBackground.models.BackgroundModel import BackgroundModel
+from pyDiamondsBackground.models.WhiteNoiseOnlyModel import WhiteNoiseOnlyModel

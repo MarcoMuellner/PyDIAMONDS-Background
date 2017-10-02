@@ -1,2 +1,2 @@
-from background.Background import Background
-from background import models
+from pyDiamondsBackground.Background import Background
+from pyDiamondsBackground import models
