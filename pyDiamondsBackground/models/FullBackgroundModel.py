@@ -1,14 +1,35 @@
 import numpy as np
+from numpy import ndarray
 
 from pyDiamondsBackground.models.BackgroundModel import BackgroundModel
 
 
 class FullBackgroundModel(BackgroundModel):
-    def __init__(self, covariates):
+    """
+    This class implements a full background model, including colored noise components. It therefore needs 12 priors
+    to compute them properly. See documentation for BackgroundModel for further documentation.
+    """
+    def __init__(self, covariates: ndarray):
+        """
+        The constructor for the FullBackgroundmodel calls the super of the Backgroundmodel and sets the dimension as
+        well as the name of the model and the covariates, which are passed as a parameter
+        :param covariates: The frequential axis of the data set
+        :type covariates: ndarray
+        """
         self._covariates = covariates
         BackgroundModel.__init__(self, covariates, 12, "Full Background model")
 
-    def predict(self, predictions, modelParameters):
+    def predict(self, predictions: ndarray, modelParameters: ndarray):
+        """
+        The predict implementation of this model implements the background of a solar like oscillator including the
+        colored noise component of the dataset.
+        :param predictions: The predictions for the sampling of the initial dataset
+        :type predictions: ndarray
+        :param modelParameters: The model parameters used to compute the initial sampling of the dataset, basically
+        representing the priors.
+        :return: The predictions of the dataset
+        :type modelParameters: ndarray
+        """
         flatNoiseLevel = modelParameters[0]
         amplitudeNoise = modelParameters[1]
         frequenceNoise = modelParameters[2]
