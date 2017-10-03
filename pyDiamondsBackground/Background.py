@@ -108,6 +108,7 @@ class Background:
         self._nestedSampler = self._setupNestedSampling(self._resultsPath,nsmcConfiguringParameters)
         # 2nd parameter -> tolerance, 3rd parameter -> exponent
         self._livePointsReducer = PowerlawReducer(self._nestedSampler, 1.e2, 0.4, self._terminationFactor)
+        self.credibleInterval = 68.3
 
         if priors is None and nyquistFrequency is None and nsmcConfiguringParameters is None and \
                         xmeansConfiguringParameters is None and rootPath is None:
@@ -247,6 +248,7 @@ class Background:
         self._nestedSampler.run(self._livePointsReducer,int(self._nInitialIterationsWithoutClustering),
                                 int(self._nIterationsWithSameClustering),int(self._maxNdrawAttempts),
                                 float(self._terminationFactor),"")
+        self._results = Results(self._nestedSampler)
 
     @property
     def parameters(self):
@@ -273,15 +275,23 @@ class Background:
 
     @property
     def posteriorProbability(self):
-        raise NotImplementedError("Not yet implemented!")
+        return self._results.posteriorProbability()
 
     @property
     def parameterSummary(self):
-        raise NotImplementedError("Not yet implemented")
+        return self._results.parameterEstimation(self.credibleInterval,False)
 
     @property
     def marginalDistributions(self):
         raise NotImplementedError("Not yet implemented")
+
+    @property
+    def credibleInterval(self):
+        return self._credibleInterval
+
+    @credibleInterval.setter
+    def credibleInterval(self,value):
+        self._credibleInterval = value
 
     def getResults(self):
         """
@@ -298,13 +308,12 @@ class Background:
         :type prefix: str
         """
         self._nestedSampler.setOutputPathPrefix(os.path.abspath(path)+"/"+ prefix)
-        self._results = Results(self._nestedSampler)
         self._results.writeParametersToFile("parameter","txt")
         self._results.writeLogLikelihoodToFile("logLikelihood.txt")
         self._results.writeLogWeightsToFile("logWeights.txt")
         self._results.writeEvidenceInformationToFile("evidenceInformation.txt")
         self._results.writePosteriorProbabilityToFile("posteriorDistribution.txt")
-        self._results.writeParametersSummaryToFile("parameterSummary.txt",68.3,True)
+        self._results.writeParametersSummaryToFile("parameterSummary.txt",self.credibleInterval,True)
 
     def _checkFileExistsAndRead(self, data, dataPath, fileName):
         if dataPath is not None:

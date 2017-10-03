@@ -220,31 +220,18 @@ def testRun(valueObject:Background):
             assert valueObject.evidenceInformation[SkillingsErrorLog] != 0
 
         def testGetPosteriorProbabilty():
-            """
-            uncomment this when the property is properly available!
             assert isinstance(valueObject.posteriorProbability,ndarray)
             assert len(valueObject.posteriorProbability) > 1
-            """
-            with pytest.raises(NotImplementedError):
-                valueObject.posteriorProbability
 
         def testGetParameterSummary():
-            """
             assert isinstance(valueObject.parameterSummary,ndarray)
             assert len(valueObject.parameterSummary) == 7
             for i in range(0,len(valueObject.parameterSummary)-1):
                 assert len(valueObject.parameterSummary[i]) == valueObject.model.dimension
-            """
-            with pytest.raises(NotImplementedError):
-                valueObject.parameterSummary
 
         def testGetMarginalDistributions():
-            """
             assert isinstance(valueObject.marginalDistributions,ndarray)
             assert len(valueObject.marginalDistributions) == 2
-            """
-            with pytest.raises(NotImplementedError):
-                valueObject.marginalDistributions
 
         testGetParameters()
         testGenericProperty(valueObject.logLikelihood)

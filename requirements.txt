@@ -1,2 +1,2 @@
 numpy==1.12.1
-pyDiamonds
+pyDiamonds==1.0.1
