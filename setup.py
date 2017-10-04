@@ -1,6 +1,4 @@
 from setuptools import setup
-from sphinx.setup_command import BuildDoc
-cmdclass = {'build_sphinx': BuildDoc}
 
 name = 'pyDiamondsBackground'
 version = '1.1'
@@ -20,10 +18,5 @@ setup(
     install_requires=[
         'numpy',
         'pyDiamonds'
-    ],
-    command_options={
-        'build_sphinx': {
-            'project': ('setup.py', name),
-            'version': ('setup.py', version),
-            'release': ('setup.py', release)}}
+    ]
 )
