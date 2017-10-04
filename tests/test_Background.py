@@ -230,8 +230,12 @@ def testRun(valueObject:Background):
                 assert len(valueObject.parameterSummary[i]) == valueObject.model.dimension
 
         def testGetMarginalDistributions():
+            """
             assert isinstance(valueObject.marginalDistributions,ndarray)
             assert len(valueObject.marginalDistributions) == 2
+            """
+            with pytest.raises(NotImplementedError):
+                valueObject.marginalDistributions
 
         testGetParameters()
         testGenericProperty(valueObject.logLikelihood)
