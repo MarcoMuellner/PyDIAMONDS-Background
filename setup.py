@@ -9,7 +9,7 @@ setup(
     name=name,
     author='Marco Muellner',
     author_email='muellnermarco@gmail.com',
-    version='1.1.1',
+    version='1.1.2',
     packages=['pyDiamondsBackground','pyDiamondsBackground/models'],
     licencse = 'MIT',
     description='An extension to pyDiamonds, intended for fitting pyDiamondsBackground signals of red giants',
@@ -17,6 +17,7 @@ setup(
     url='https://github.com/muma7490/PyDIAMONDS-Background',
     install_requires=[
         'numpy',
-        'pyDiamonds'
+        'pyDiamonds',
+        'sphinx'
     ]
 )
